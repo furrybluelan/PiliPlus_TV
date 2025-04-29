@@ -28,6 +28,7 @@ class LiveController
   @override
   bool handleError(String? errMsg) {
     if (errMsg?.startsWith('voucher') == true) {
+      loadingState.value = LoadingState.error(' -352 ');
       RequestUtils.validate(
         errMsg!,
         (gaiaVtoken) {
@@ -35,7 +36,6 @@ class LiveController
           onReload();
         },
       );
-      loadingState.value = LoadingState.error(' -352 ');
       return true;
     }
     return false;

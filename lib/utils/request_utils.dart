@@ -491,8 +491,12 @@ class RequestUtils {
             token: captchaData.token,
             validate: captchaData.validate,
           );
-          if (res['status']) {
-            onSuccess.call(captchaData.token!);
+          if (res['status'] && res['data']?['is_valid'] == 1) {
+            // onSuccess(captchaData.token!);
+            final griskId = res['data']?['grisk_id'];
+            if (griskId != null) {
+              onSuccess(griskId);
+            }
           } else {
             SmartDialog.showToast(res['msg']);
           }
