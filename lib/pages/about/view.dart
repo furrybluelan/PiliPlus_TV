@@ -165,16 +165,6 @@ Commit Hash: ${BuildConfig.commitHash}''',
               ),
             ),
           ListTile(
-            onTap: () => PageUtils.launchURL('$_sourceCodeUrl/issues'),
-            leading: const Icon(Icons.feedback_outlined),
-            title: const Text('问题反馈'),
-            trailing: Icon(
-              Icons.arrow_forward,
-              size: 16,
-              color: outline,
-            ),
-          ),
-          ListTile(
             onTap: () => Get.toNamed('/logs'),
             onLongPress: clearLogs,
             leading: const Icon(Icons.bug_report_outlined),
