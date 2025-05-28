@@ -27,7 +27,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -697,8 +697,8 @@ class _VideoInfoState extends State<VideoInfo> {
                             ),
                           ),
                         ],
-                        if (videoIntroController.videoTags is List &&
-                            videoIntroController.videoTags.isNotEmpty) ...[
+                        if (videoIntroController.videoTags?.isNotEmpty ==
+                            true) ...[
                           GestureDetector(
                             onTap: () {},
                             behavior: HitTestBehavior.opaque,
@@ -708,20 +708,17 @@ class _VideoInfoState extends State<VideoInfo> {
                               child: Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
-                                children: (videoIntroController.videoTags
-                                        as List)
+                                children: videoIntroController.videoTags!
                                     .map(
                                       (item) => SearchText(
                                         fontSize: 13,
-                                        text: item['tag_name'],
-                                        onTap: (_) => Get.toNamed(
+                                        text: item.tagName!,
+                                        onTap: (tagName) => Get.toNamed(
                                           '/searchResult',
-                                          parameters: {
-                                            'keyword': item['tag_name']
-                                          },
+                                          parameters: {'keyword': tagName},
                                         ),
-                                        onLongPress: (_) =>
-                                            Utils.copyText(item['tag_name']),
+                                        onLongPress: (tagName) =>
+                                            Utils.copyText(tagName),
                                       ),
                                     )
                                     .toList(),

@@ -179,7 +179,7 @@ class _WhisperPageState extends State<WhisperPage> {
                   );
                 },
               );
-            }).toList(),
+            }),
           ),
         ),
       );

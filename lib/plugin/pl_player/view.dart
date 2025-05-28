@@ -7,6 +7,7 @@ import 'package:PiliPlus/common/widgets/progress_bar/audio_video_progress_bar.da
 import 'package:PiliPlus/common/widgets/progress_bar/segment_progress_bar.dart';
 import 'package:PiliPlus/models/common/super_resolution_type.dart';
 import 'package:PiliPlus/models/video_detail_res.dart';
+import 'package:PiliPlus/models/video_shot/data.dart';
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
@@ -1772,7 +1773,7 @@ Widget buildDmChart(
                 plPlayerController.dmTrend.length,
                 (index) => FlSpot(
                   index.toDouble(),
-                  plPlayerController.dmTrend[index].toDouble(),
+                  plPlayerController.dmTrend[index],
                 ),
               ),
               isCurved: true,
@@ -1793,98 +1794,86 @@ Widget buildDmChart(
 
 Widget buildSeekPreviewWidget(PlPlayerController plPlayerController) {
   return Obx(() {
-    if (plPlayerController.showPreview.value.not) {
+    if (!plPlayerController.showPreview.value ||
+        plPlayerController.videoShot?['status'] != true) {
+      if (plPlayerController.videoShot == null) {
+        plPlayerController.getVideoShot();
+      }
       return SizedBox.shrink(
         key: ValueKey(plPlayerController.previewDx.value),
       );
     }
-    if (plPlayerController.videoShot == null) {
-      plPlayerController.getVideoShot();
-      return SizedBox.shrink(
-        key: ValueKey(plPlayerController.previewDx.value),
-      );
-    } else if (plPlayerController.videoShot!['status'] == false) {
-      return SizedBox.shrink(
-        key: ValueKey(plPlayerController.previewDx.value),
-      );
-    }
+
+    VideoShotData data = plPlayerController.videoShot!['data'];
 
     return LayoutBuilder(
-        key: ValueKey(plPlayerController.previewDx.value),
-        builder: (context, constraints) {
-          try {
-            double scale = plPlayerController.isFullScreen.value &&
-                    plPlayerController.direction.value == 'horizontal'
-                ? 4
-                : 2.5;
-            // offset
-            double left = (plPlayerController.previewDx.value - 48 * scale / 2)
-                .clamp(8, constraints.maxWidth - 48 * scale - 8);
+      key: ValueKey(plPlayerController.previewDx.value),
+      builder: (context, constraints) {
+        try {
+          double scale = plPlayerController.isFullScreen.value &&
+                  plPlayerController.direction.value == 'horizontal'
+              ? 4
+              : 2.5;
+          // offset
+          double left = (plPlayerController.previewDx.value - 48 * scale / 2)
+              .clamp(8, constraints.maxWidth - 48 * scale - 8);
 
-            // index
-            // int index = plPlayerController.sliderPositionSeconds.value ~/ 5;
-            int index = max(
-                0,
-                (List<int>.from(plPlayerController.videoShot!['data']['index'])
-                        .where((item) =>
-                            item <=
-                            plPlayerController.sliderPositionSeconds.value)
-                        .length -
-                    2));
-
-            // pageIndex
-            int pageIndex = (index ~/ 100).clamp(
+          // index
+          // int index = plPlayerController.sliderPositionSeconds.value ~/ 5;
+          int index = max(
               0,
-              (plPlayerController.videoShot!['data']['image'] as List).length,
-            );
+              (data.index!
+                      .where((item) =>
+                          item <=
+                          plPlayerController.sliderPositionSeconds.value)
+                      .length -
+                  2));
 
-            // alignment
-            double cal(m) {
-              return -1 + 2 / 9 * m;
-            }
+          // pageIndex
+          int pageIndex = (index ~/ 100).clamp(0, data.image!.length);
 
-            int align = index % 100;
-            int x = align % 10;
-            int y = align ~/ 10;
-            double dx = cal(x);
-            double dy = cal(y);
-            Alignment alignment = Alignment(dx, dy);
+          // alignment
+          double cal(m) {
+            return -1 + 2 / 9 * m;
+          }
 
-            // url
-            String parseUrl(String url) {
-              return url.startsWith('//') ? 'https:$url' : url;
-            }
+          int align = index % 100;
+          int x = align % 10;
+          int y = align ~/ 10;
+          double dx = cal(x);
+          double dy = cal(y);
+          Alignment alignment = Alignment(dx, dy);
 
-            return Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(left: left),
-              child: UnconstrainedBox(
-                child: ClipRRect(
-                  borderRadius: scale == 2.5
-                      ? const BorderRadius.all(Radius.circular(6))
-                      : StyleString.mdRadius,
-                  child: Align(
-                    widthFactor: 0.1,
-                    heightFactor: 0.1,
-                    alignment: alignment,
-                    child: CachedNetworkImage(
-                      fit: BoxFit.fill,
-                      width: 480 * scale,
-                      height: 270 * scale,
-                      imageUrl: parseUrl(plPlayerController.videoShot!['data']
-                          ['image'][pageIndex]),
-                    ),
+          return Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(left: left),
+            child: UnconstrainedBox(
+              child: ClipRRect(
+                borderRadius: scale == 2.5
+                    ? const BorderRadius.all(Radius.circular(6))
+                    : StyleString.mdRadius,
+                child: Align(
+                  widthFactor: 0.1,
+                  heightFactor: 0.1,
+                  alignment: alignment,
+                  child: CachedNetworkImage(
+                    fit: BoxFit.fill,
+                    width: 480 * scale,
+                    height: 270 * scale,
+                    imageUrl: data.image![pageIndex].http2https,
                   ),
                 ),
               ),
-            );
-          } catch (e) {
-            debugPrint('seek preview: $e');
-            return SizedBox.shrink(
-              key: ValueKey(plPlayerController.previewDx.value),
-            );
-          }
-        });
+            ),
+          );
+        } catch (e) {
+          debugPrint('seek preview: $e');
+          return SizedBox.shrink(
+            key: ValueKey(plPlayerController.previewDx.value),
+          );
+        }
+      },
+    );
   });
 }
 

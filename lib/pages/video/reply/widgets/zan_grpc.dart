@@ -94,24 +94,23 @@ class _ZanButtonGrpcState extends State<ZanButtonGrpc> {
     }
   }
 
-  ButtonStyle get _style => TextButton.styleFrom(
-        padding: EdgeInsets.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-      );
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color color = theme.colorScheme.outline;
     final Color primary = theme.colorScheme.primary;
+    final ButtonStyle style = TextButton.styleFrom(
+      padding: EdgeInsets.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           height: 32,
           child: TextButton(
-            style: _style,
+            style: style,
             onPressed: () => handleState(onHateReply),
             child: Icon(
               isDislike
@@ -126,7 +125,7 @@ class _ZanButtonGrpcState extends State<ZanButtonGrpc> {
         SizedBox(
           height: 32,
           child: TextButton(
-            style: _style,
+            style: style,
             onPressed: () => handleState(onLikeReply),
             child: Row(
               children: [

@@ -6,12 +6,14 @@ import 'package:PiliPlus/models/dynamics/result.dart';
 import 'package:PiliPlus/pages/dynamics/widgets/vote.dart';
 import 'package:PiliPlus/utils/app_scheme.dart';
 import 'package:PiliPlus/utils/utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
-Widget addWidget(
-    ThemeData theme, DynamicItemModel item, BuildContext context, type,
+Widget addWidget(ThemeData theme, DynamicItemModel item, BuildContext context,
     {floor = 1}) {
+  final type = item.modules.moduleDynamic?.additional?.type;
   late final Color bgColor = floor == 1
       ? theme.dividerColor.withValues(alpha: 0.08)
       : theme.colorScheme.surface;
@@ -102,22 +104,60 @@ Widget addWidget(
                                       TextSpan(
                                         style: TextStyle(
                                           color: theme.colorScheme.outline,
-                                          fontSize: theme
-                                              .textTheme.labelMedium!.fontSize,
+                                          fontSize: 13,
                                         ),
                                         children: [
-                                          if (reserve.desc1 != null)
+                                          if (reserve.desc1?.text?.isNotEmpty ==
+                                              true)
                                             TextSpan(text: reserve.desc1!.text),
-                                          const TextSpan(text: '  '),
-                                          if (reserve.desc2 != null)
-                                            TextSpan(text: reserve.desc2!.text),
+                                          if (reserve.desc2?.text?.isNotEmpty ==
+                                              true)
+                                            TextSpan(
+                                                text:
+                                                    '    ${reserve.desc2!.text}'),
+                                          if (reserve.desc3?.text?.isNotEmpty ==
+                                              true) ...[
+                                            const TextSpan(text: '\n'),
+                                            WidgetSpan(
+                                              alignment:
+                                                  PlaceholderAlignment.middle,
+                                              child: Icon(
+                                                size: 17,
+                                                Icons.card_giftcard,
+                                                color:
+                                                    theme.colorScheme.primary,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: ' ${reserve.desc3!.text}',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.primary,
+                                              ),
+                                              recognizer:
+                                                  reserve.desc3!.jumpUrl == null
+                                                      ? null
+                                                      : (TapGestureRecognizer()
+                                                        ..onTap = () {
+                                                          Get.toNamed(
+                                                            '/webview',
+                                                            parameters: {
+                                                              'url': reserve
+                                                                  .desc3!
+                                                                  .jumpUrl!
+                                                            },
+                                                          );
+                                                        }),
+                                            ),
+                                          ],
                                         ],
                                       ),
                                     )
                                   ],
                                 ),
                               ),
-                              if (reserve.button != null)
+                              if (reserve.button != null) ...[
+                                const SizedBox(width: 10),
                                 Builder(
                                   builder: (context) {
                                     final btn = reserve.button!;
@@ -187,6 +227,7 @@ Widget addWidget(
                                     );
                                   },
                                 ),
+                              ],
                             ],
                           ),
                         ),
@@ -195,6 +236,104 @@ Widget addWidget(
                   )
                 : const SizedBox.shrink()
             : const SizedBox.shrink();
+      case 'ADDITIONAL_TYPE_UPOWER_LOTTERY':
+        final content = item.modules.moduleDynamic!.additional!.upowerLottery!;
+        final borderRadius = floor == 1 ? null : StyleString.mdRadius;
+        return Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Material(
+            color: bgColor,
+            borderRadius: borderRadius,
+            child: InkWell(
+              borderRadius: borderRadius,
+              onTap: content.jumpUrl == null
+                  ? null
+                  : () => PiliScheme.routePushFromUrl(content.jumpUrl!),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        spacing: 2,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (content.title?.isNotEmpty == true)
+                            Text(content.title!),
+                          if (content.hint?.text?.isNotEmpty == true)
+                            Text(
+                              content.hint!.text!,
+                              style: TextStyle(
+                                color: theme.colorScheme.outline,
+                                fontSize: 13,
+                              ),
+                            ),
+                          if (content.desc?.text?.isNotEmpty == true)
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Icon(
+                                      size: 17,
+                                      Icons.card_giftcard,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' ${content.desc!.text!}',
+                                    style: TextStyle(
+                                      color: theme.colorScheme.primary,
+                                      fontSize: 13,
+                                    ),
+                                    recognizer: content.desc!.jumpUrl == null
+                                        ? null
+                                        : (TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Get.toNamed(
+                                              '/webview',
+                                              parameters: {
+                                                'url': content.desc!.jumpUrl!
+                                              },
+                                            );
+                                          }),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (content.button != null) ...[
+                      const SizedBox(width: 10),
+                      FilledButton.tonal(
+                        onPressed: content.button!.jumpUrl == null
+                            ? null
+                            : () => PiliScheme.routePushFromUrl(
+                                  content.button!.jumpUrl!,
+                                ),
+                        style: FilledButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          visualDensity:
+                              const VisualDensity(horizontal: -2, vertical: -3),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(content.button!.jumpStyle?.text ??
+                            content.button!.check?.text ??
+                            ''),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       // 商品
       case 'ADDITIONAL_TYPE_GOODS':
         final content = item.modules.moduleDynamic!.additional!.goods!;
@@ -283,12 +422,6 @@ Widget addWidget(
           );
         }
         return const SizedBox.shrink();
-      // case 'ADDITIONAL_TYPE_MATCH':
-      // final content = item.modules.moduleDynamic!.additional!.match;
-      //   return const SizedBox.shrink();
-      // case 'ADDITIONAL_TYPE_COMMON':
-      // final content = item.modules.moduleDynamic!.additional!.common;
-      //   return const SizedBox.shrink();
       case 'ADDITIONAL_TYPE_VOTE':
         final vote = item.modules.moduleDynamic!.additional!.vote!;
         final borderRadius = floor == 1 ? null : StyleString.mdRadius;
@@ -370,6 +503,204 @@ Widget addWidget(
                       ),
                       child: const Text('参与'),
                     ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      case 'ADDITIONAL_TYPE_COMMON':
+        final content = item.modules.moduleDynamic!.additional!.common!;
+        final borderRadius = floor == 1 ? null : StyleString.mdRadius;
+        return Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Material(
+            color: bgColor,
+            borderRadius: borderRadius,
+            child: InkWell(
+              borderRadius: borderRadius,
+              onTap: content.jumpUrl == null
+                  ? null
+                  : () => PiliScheme.routePushFromUrl(content.jumpUrl!),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  children: [
+                    if (content.cover?.isNotEmpty == true) ...[
+                      NetworkImgLayer(
+                        width: 45,
+                        height: 45,
+                        src: content.cover,
+                        radius: 6,
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Expanded(
+                      child: Column(
+                        spacing: 2,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (content.title?.isNotEmpty == true)
+                            Text(content.title!),
+                          if (content.desc1?.isNotEmpty == true)
+                            Text(
+                              content.desc1!,
+                              style: TextStyle(
+                                color: theme.colorScheme.outline,
+                                fontSize: 13,
+                              ),
+                            ),
+                          if (content.desc2?.isNotEmpty == true)
+                            Text(
+                              content.desc2!,
+                              style: TextStyle(
+                                color: theme.colorScheme.outline,
+                                fontSize: 13,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (content.button?.jumpUrl?.isNotEmpty == true) ...[
+                      const SizedBox(width: 10),
+                      FilledButton.tonal(
+                        onPressed: () => PiliScheme.routePushFromUrl(
+                          content.button!.jumpUrl!,
+                        ),
+                        style: FilledButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          visualDensity:
+                              const VisualDensity(horizontal: -2, vertical: -3),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(content.button!.jumpStyle?.text ?? ''),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      case 'ADDITIONAL_TYPE_MATCH':
+        final content = item.modules.moduleDynamic!.additional!.match!;
+        final borderRadius = floor == 1 ? null : StyleString.mdRadius;
+        return Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Material(
+            color: bgColor,
+            borderRadius: borderRadius,
+            child: InkWell(
+              borderRadius: borderRadius,
+              onTap: content.jumpUrl == null
+                  ? null
+                  : () => PiliScheme.routePushFromUrl(content.jumpUrl!),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (content.matchInfo?.title?.isNotEmpty == true)
+                          Text(
+                            content.matchInfo!.title!,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        if (content.matchInfo?.subTitle?.isNotEmpty == true)
+                          Text(
+                            content.matchInfo!.subTitle!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: theme.colorScheme.outline,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const Spacer(),
+                    if (content.matchInfo?.leftTeam != null) ...[
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          NetworkImgLayer(
+                            width: 30,
+                            height: 30,
+                            src: content.matchInfo!.leftTeam!.pic,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            content.matchInfo!.leftTeam!.name!,
+                            style: const TextStyle(fontSize: 13),
+                          )
+                        ],
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                    Column(
+                      children: [
+                        if (content.matchInfo?.centerTop?.isNotEmpty == true)
+                          Container(
+                            height: 35,
+                            alignment: Alignment.center,
+                            child: Text(
+                              content.matchInfo!.centerTop!.join(' '),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        if (content.matchInfo?.centerBottom?.isNotEmpty == true)
+                          Text(
+                            content.matchInfo!.centerBottom!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: theme.colorScheme.outline,
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (content.matchInfo?.rightTeam != null) ...[
+                      const SizedBox(width: 16),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          NetworkImgLayer(
+                            width: 30,
+                            height: 30,
+                            src: content.matchInfo!.rightTeam!.pic,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            content.matchInfo!.rightTeam!.name!,
+                            style: const TextStyle(fontSize: 13),
+                          )
+                        ],
+                      ),
+                    ],
+                    const Spacer(),
+                    if (content.button != null)
+                      FilledButton.tonal(
+                        onPressed: () => PiliScheme.routePushFromUrl(
+                          content.button!.jumpUrl!,
+                        ),
+                        style: FilledButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          visualDensity:
+                              const VisualDensity(horizontal: -2, vertical: -3),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(content.button!.jumpStyle?.text ?? ''),
+                      ),
                   ],
                 ),
               ),

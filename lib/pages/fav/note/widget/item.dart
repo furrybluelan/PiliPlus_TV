@@ -13,7 +13,7 @@ class FavNoteItem extends StatelessWidget {
     required this.onSelect,
   });
 
-  final FavArticleModel item;
+  final FavNoteModel item;
   final FavNoteController ctr;
   final VoidCallback onSelect;
 

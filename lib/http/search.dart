@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:PiliPlus/http/api.dart';
 import 'package:PiliPlus/http/init.dart';
 import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/bangumi/info.dart';
 import 'package:PiliPlus/models/common/search_type.dart';
+import 'package:PiliPlus/models/pgc/info.dart';
 import 'package:PiliPlus/models/search/result.dart';
 import 'package:PiliPlus/models/search/search_trending/trending_data.dart';
 import 'package:PiliPlus/models/search/suggest.dart';
+import 'package:PiliPlus/models/topic_pub_search/data.dart';
 import 'package:PiliPlus/utils/extension.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:flutter/material.dart';
@@ -255,6 +256,31 @@ class SearchHttp {
     });
     if (res.data['code'] == 0) {
       return Success(SearchKeywordData.fromJson(res.data['data']));
+    } else {
+      return Error(res.data['message']);
+    }
+  }
+
+  static Future<LoadingState<TopicPubSearchData>> topicPubSearch({
+    required String keywords,
+    String content = '',
+    required int pageNum,
+  }) async {
+    final res = await Request().get(
+      Api.topicPubSearch,
+      queryParameters: {
+        'keywords': keywords,
+        'content': content,
+        if (pageNum == 1) ...{
+          'page_size': 20,
+          'page_num': 1,
+        } else
+          'offset': 20 * (pageNum - 1),
+        'web_location': 333.1365,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return Success(TopicPubSearchData.fromJson(res.data['data']));
     } else {
       return Error(res.data['message']);
     }

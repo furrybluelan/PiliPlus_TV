@@ -36,6 +36,8 @@ class _FavNoteChildPageState extends State<FavNoteChildPage>
           refreshIndicator(
             onRefresh: _favNoteController.onRefresh,
             child: CustomScrollView(
+              controller: _favNoteController.scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.only(
@@ -130,7 +132,7 @@ class _FavNoteChildPageState extends State<FavNoteChildPage>
     );
   }
 
-  Widget _buildBody(LoadingState<List<FavArticleModel>?> loadingState) {
+  Widget _buildBody(LoadingState<List<FavNoteModel>?> loadingState) {
     return switch (loadingState) {
       Loading() => SliverGrid(
           gridDelegate: Grid.videoCardHDelegate(context),

@@ -1,9 +1,12 @@
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/user.dart';
+import 'package:PiliPlus/models/fav_article/data.dart';
+import 'package:PiliPlus/models/fav_article/item.dart';
 import 'package:PiliPlus/pages/common/common_list_controller.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
-class FavArticleController extends CommonListController {
+class FavArticleController
+    extends CommonListController<FavArticleData, FavArticleItemModel> {
   @override
   void onInit() {
     super.onInit();
@@ -11,20 +14,16 @@ class FavArticleController extends CommonListController {
   }
 
   @override
-  List? getDataList(response) {
-    return response?['items'];
-  }
-
-  @override
-  bool customHandleResponse(bool isRefresh, Success response) {
-    if (response.response?['has_more'] == false) {
+  List<FavArticleItemModel>? getDataList(FavArticleData response) {
+    if (response.hasMore == false) {
       isEnd = true;
     }
-    return false;
+    return response.items;
   }
 
   @override
-  Future<LoadingState> customGetData() => UserHttp.favArticle(page: page);
+  Future<LoadingState<FavArticleData>> customGetData() =>
+      UserHttp.favArticle(page: page);
 
   Future<void> onRemove(index, id) async {
     final res = await UserHttp.communityAction(opusId: id, action: 4);

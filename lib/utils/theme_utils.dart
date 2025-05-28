@@ -82,6 +82,8 @@ class ThemeUtils {
         shadowColor: Colors.transparent,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
+        // ignore: deprecated_member_use
+        year2023: false,
         refreshBackgroundColor: colorScheme.onSecondary,
       ),
       dialogTheme: DialogThemeData(
@@ -101,6 +103,8 @@ class ThemeUtils {
           ),
         ),
       ),
+      // ignore: deprecated_member_use
+      sliderTheme: const SliderThemeData(year2023: false),
     );
     if (isDark && GStorage.isPureBlackTheme) {
       themeData = darkenTheme(themeData);

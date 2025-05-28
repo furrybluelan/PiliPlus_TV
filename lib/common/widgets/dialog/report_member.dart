@@ -19,7 +19,7 @@ class MemberReportPanel extends StatefulWidget {
 }
 
 class _MemberReportPanelState extends State<MemberReportPanel> {
-  final List<bool> _reasonList = List.generate(3, (_) => false).toList();
+  final List<bool> _reasonList = List.generate(3, (_) => false);
   final Set<int> _reason = {};
   int? _reasonV2;
 

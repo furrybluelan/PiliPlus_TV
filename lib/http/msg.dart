@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:PiliPlus/http/api.dart';
 import 'package:PiliPlus/http/constants.dart';
 import 'package:PiliPlus/http/init.dart';
 import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/common/reply/reply_option_type.dart';
 import 'package:PiliPlus/models/msg/account.dart';
 import 'package:PiliPlus/models/msg/im_user_infos/datum.dart';
 import 'package:PiliPlus/models/msg/msg_dnd/uid_setting.dart';
@@ -97,84 +94,6 @@ class MsgHttp {
     if (res.data['code'] == 0) {
       return {
         'status': true,
-      };
-    } else {
-      return {
-        'status': false,
-        'msg': res.data['message'],
-      };
-    }
-  }
-
-  static Future createDynamic({
-    dynamic mid,
-    dynamic dynIdStr, // repost dyn
-    dynamic rid, // repost video
-    dynamic dynType,
-    dynamic rawText,
-    List? pics,
-    int? publishTime,
-    ReplyOptionType? replyOption,
-    int? privatePub,
-  }) async {
-    var res = await Request().post(
-      Api.createDynamic,
-      queryParameters: {
-        'platform': 'web',
-        'csrf': Accounts.main.csrf,
-        'x-bili-device-req-json': {"platform": "web", "device": "pc"},
-        'x-bili-web-req-json': {"spm_id": "333.999"},
-      },
-      data: {
-        "dyn_req": {
-          "content": {
-            "contents": [
-              {
-                "raw_text": rawText,
-                "type": 1,
-                "biz_id": "",
-              }
-            ]
-          },
-          if (privatePub != null || replyOption != null || publishTime != null)
-            "option": {
-              if (privatePub != null) 'private_pub': privatePub,
-              if (publishTime != null) "timer_pub_time": publishTime,
-              if (replyOption == ReplyOptionType.close)
-                "close_comment": 1
-              else if (replyOption == ReplyOptionType.choose)
-                "up_choose_comment": 1,
-            },
-          "scene": rid != null
-              ? 5
-              : dynIdStr != null
-                  ? 4
-                  : pics != null
-                      ? 2
-                      : 1,
-          if (pics != null) 'pics': pics,
-          "attach_card": null,
-          "upload_id":
-              "${rid != null ? 0 : mid}_${DateTime.now().millisecondsSinceEpoch ~/ 1000}_${Random().nextInt(9000) + 1000}",
-          "meta": {
-            "app_meta": {"from": "create.dynamic.web", "mobi_app": "web"}
-          }
-        },
-        if (dynIdStr != null || rid != null)
-          "web_repost_src": {
-            if (dynIdStr != null) "dyn_id_str": dynIdStr,
-            if (rid != null)
-              "revs_id": {
-                "dyn_type": dynType,
-                "rid": rid,
-              }
-          }
-      },
-    );
-    if (res.data['code'] == 0) {
-      return {
-        'status': true,
-        'data': res.data['data'],
       };
     } else {
       return {

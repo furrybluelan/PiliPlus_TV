@@ -214,7 +214,7 @@ class Utils {
 
   static String numFormat(dynamic number) {
     if (number == null) {
-      return '00:00';
+      return '0';
     }
     if (number is String) {
       number = int.tryParse(number) ?? number;

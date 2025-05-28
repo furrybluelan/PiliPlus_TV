@@ -6,8 +6,9 @@ import 'package:PiliPlus/grpc/view.dart';
 import 'package:PiliPlus/http/constants.dart';
 import 'package:PiliPlus/http/user.dart';
 import 'package:PiliPlus/http/video.dart';
-import 'package:PiliPlus/models/bangumi/info.dart';
+import 'package:PiliPlus/models/pgc/info.dart';
 import 'package:PiliPlus/models/user/fav_folder.dart';
+import 'package:PiliPlus/models/video_tag/data.dart';
 import 'package:PiliPlus/pages/dynamics_repost/view.dart';
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
@@ -39,7 +40,7 @@ class BangumiIntroController extends GetxController {
           ? '追番'
           : '追剧';
 
-  BangumiInfoModel bangumiItem = Get.arguments['bangumiItem'];
+  final BangumiInfoModel bangumiItem = Get.arguments['bangumiItem'];
 
   // 是否点赞
   RxBool hasLike = false.obs;
@@ -50,7 +51,7 @@ class BangumiIntroController extends GetxController {
   // 是否收藏
   RxBool hasFav = false.obs;
 
-  dynamic videoTags;
+  List<VideoTagItem>? videoTags;
 
   List? favIds;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;

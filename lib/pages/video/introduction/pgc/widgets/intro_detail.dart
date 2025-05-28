@@ -1,18 +1,26 @@
+import 'package:PiliPlus/common/widgets/button/icon_button.dart';
+import 'package:PiliPlus/common/widgets/keep_alive_wrapper.dart';
+import 'package:PiliPlus/common/widgets/page/tabs.dart';
+import 'package:PiliPlus/common/widgets/scroll_physics.dart';
 import 'package:PiliPlus/common/widgets/stat/stat.dart';
-import 'package:PiliPlus/models/bangumi/info.dart';
+import 'package:PiliPlus/models/pgc/info.dart';
+import 'package:PiliPlus/models/video_tag/data.dart';
 import 'package:PiliPlus/pages/common/common_collapse_slide_page.dart';
+import 'package:PiliPlus/pages/pgc_review/view.dart';
 import 'package:PiliPlus/pages/search/widgets/search_text.dart';
+import 'package:PiliPlus/utils/extension.dart';
 import 'package:PiliPlus/utils/utils.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TabBarView;
 import 'package:get/get.dart';
 
 class IntroDetail extends CommonCollapseSlidePage {
   final BangumiInfoModel bangumiDetail;
-  final dynamic videoTags;
+  final List<VideoTagItem>? videoTags;
 
   const IntroDetail({
     super.key,
     required this.bangumiDetail,
+    super.enableSlide = false,
     this.videoTags,
   });
 
@@ -21,34 +29,58 @@ class IntroDetail extends CommonCollapseSlidePage {
 }
 
 class _IntroDetailState extends CommonCollapseSlidePageState<IntroDetail> {
+  late final _tabController = TabController(length: 2, vsync: this);
+  final _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget buildPage(ThemeData theme) {
-    return Material(
-      color: theme.colorScheme.surface,
-      child: Column(
+    return CustomTabBarView(
+      controller: _tabController,
+      physics: const CustomTabBarViewScrollPhysics(),
+      bgColor: theme.colorScheme.surface,
+      header: Row(
         children: [
-          GestureDetector(
-            onTap: Get.back,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              height: 35,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Container(
-                width: 32,
-                height: 3,
-                decoration: BoxDecoration(
-                    color: theme.colorScheme.onSecondaryContainer
-                        .withValues(alpha: 0.5),
-                    borderRadius: const BorderRadius.all(Radius.circular(3))),
-              ),
+          Expanded(
+            child: TabBar(
+              controller: _tabController,
+              dividerHeight: 0,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              dividerColor: Colors.transparent,
+              tabs: const [Tab(text: '详情'), Tab(text: '点评')],
+              onTap: (index) {
+                if (!_tabController.indexIsChanging) {
+                  if (index == 0) {
+                    _controller.animToTop();
+                  }
+                }
+              },
             ),
           ),
-          Expanded(
-            child: enableSlide ? slideList(theme) : buildList(theme),
-          )
+          iconButton(
+            context: context,
+            icon: Icons.clear,
+            onPressed: Get.back,
+            iconSize: 22,
+            bgColor: Colors.transparent,
+          ),
+          const SizedBox(width: 12),
         ],
       ),
+      children: [
+        KeepAliveWrapper(builder: (context) => buildList(theme)),
+        PgcReviewPage(
+          name: widget.bangumiDetail.title!,
+          mediaId: widget.bangumiDetail.mediaId,
+        ),
+      ],
     );
   }
 
@@ -59,19 +91,18 @@ class _IntroDetailState extends CommonCollapseSlidePageState<IntroDetail> {
       color: theme.colorScheme.onSurface,
     );
     return ListView(
-      controller: ScrollController(),
+      controller: _controller,
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.only(
         left: 14,
         right: 14,
+        top: 14,
         bottom: MediaQuery.paddingOf(context).bottom + 80,
       ),
       children: [
         SelectableText(
           widget.bangumiDetail.title!,
-          style: const TextStyle(
-            fontSize: 16,
-          ),
+          style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 4),
         Row(
@@ -128,23 +159,21 @@ class _IntroDetailState extends CommonCollapseSlidePageState<IntroDetail> {
           widget.bangumiDetail.actors!,
           style: smallTitle.copyWith(fontSize: 14),
         ),
-        if (widget.videoTags is List && widget.videoTags.isNotEmpty) ...[
+        if (widget.videoTags?.isNotEmpty == true) ...[
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: (widget.videoTags as List)
+            children: widget.videoTags!
                 .map(
                   (item) => SearchText(
                     fontSize: 13,
-                    text: item['tag_name'],
-                    onTap: (_) => Get.toNamed(
+                    text: item.tagName!,
+                    onTap: (tagName) => Get.toNamed(
                       '/searchResult',
-                      parameters: {
-                        'keyword': item['tag_name'],
-                      },
+                      parameters: {'keyword': tagName},
                     ),
-                    onLongPress: (_) => Utils.copyText(item['tag_name']),
+                    onLongPress: (tagName) => Utils.copyText(tagName),
                   ),
                 )
                 .toList(),

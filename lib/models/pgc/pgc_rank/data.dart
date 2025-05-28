@@ -1,4 +1,4 @@
-import 'package:PiliPlus/models/bangumi/pgc_rank/pgc_rank_item_model.dart';
+import 'package:PiliPlus/models/pgc/pgc_rank/pgc_rank_item_model.dart';
 
 class Data {
   List<PgcRankItemModel>? list;

@@ -33,7 +33,6 @@ class _HomePageState extends State<HomePage>
     super.build(context);
     final theme = Theme.of(context);
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(toolbarHeight: 0),
       body: Column(
         children: [

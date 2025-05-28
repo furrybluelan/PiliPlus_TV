@@ -6,7 +6,7 @@ part 'media_list_response.g.dart';
 @JsonSerializable()
 class MediaListResponse {
   int? count;
-  List<FavList>? list;
+  List<SpaceFavItemModel>? list;
   @JsonKey(name: 'has_more')
   bool? hasMore;
 

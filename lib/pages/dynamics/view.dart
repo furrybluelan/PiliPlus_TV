@@ -1,3 +1,5 @@
+import 'package:PiliPlus/common/widgets/draggable_sheet/draggable_scrollable_sheet_dyn.dart'
+    show DraggableScrollableSheet;
 import 'package:PiliPlus/common/widgets/scroll_physics.dart';
 import 'package:PiliPlus/models/common/dynamic/dynamics_type.dart';
 import 'package:PiliPlus/models/common/dynamic/up_panel_position.dart';
@@ -6,7 +8,7 @@ import 'package:PiliPlus/pages/dynamics/widgets/up_panel.dart';
 import 'package:PiliPlus/pages/dynamics_create/view.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:easy_debounce/easy_throttle.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DraggableScrollableSheet;
 import 'package:get/get.dart';
 
 class DynamicsPage extends StatefulWidget {
@@ -44,7 +46,16 @@ class _DynamicsPageState extends State<DynamicsPage>
                   context: context,
                   useSafeArea: true,
                   isScrollControlled: true,
-                  builder: (context) => const CreateDynPanel(),
+                  builder: (context) => DraggableScrollableSheet(
+                    snap: true,
+                    expand: false,
+                    initialChildSize: 1,
+                    minChildSize: 0,
+                    maxChildSize: 1,
+                    snapSizes: const [1],
+                    builder: (context, scrollController) =>
+                        CreateDynPanel(scrollController: scrollController),
+                  ),
                 );
               }
             },

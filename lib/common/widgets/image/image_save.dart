@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/button/icon_button.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
@@ -12,7 +10,7 @@ void imageSaveDialog({
   required String? title,
   required String? cover,
 }) {
-  final double imgWidth = min(Get.width, Get.height) - 8 * 2;
+  final double imgWidth = Get.mediaQuery.size.shortestSide - 8 * 2;
   SmartDialog.show(
     animationType: SmartAnimationType.centerScale_otherSlide,
     builder: (context) {

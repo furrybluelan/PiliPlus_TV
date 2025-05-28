@@ -10,7 +10,7 @@ import 'package:PiliPlus/utils/extension.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:canvas_danmaku/models/danmaku_content_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
@@ -342,18 +342,14 @@ class _SendDanmakuPanelState extends CommonPublishPageState<SendDanmakuPanel> {
               context: context,
               tooltip: '弹幕样式',
               onPressed: () {
-                if (selectKeyboard.value) {
-                  selectKeyboard.value = false;
-                  updatePanelType(PanelType.emoji);
-                } else {
-                  selectKeyboard.value = true;
-                  updatePanelType(PanelType.keyboard);
-                }
+                updatePanelType(panelType.value == PanelType.keyboard
+                    ? PanelType.emoji
+                    : PanelType.keyboard);
               },
               bgColor: Colors.transparent,
               iconSize: 24,
               icon: Icons.text_format,
-              iconColor: selectKeyboard.value.not
+              iconColor: panelType.value == PanelType.emoji
                   ? themeData.colorScheme.primary
                   : themeData.colorScheme.onSurfaceVariant,
             ),
@@ -366,7 +362,6 @@ class _SendDanmakuPanelState extends CommonPublishPageState<SendDanmakuPanel> {
                 onPointerUp: (event) {
                   if (readOnly.value) {
                     updatePanelType(PanelType.keyboard);
-                    selectKeyboard.value = true;
                   }
                 },
                 child: Obx(

@@ -175,7 +175,9 @@ abstract class ReplyController<R> extends CommonListController<R, ReplyInfo> {
               if (oid != null) {
                 list.insert(hasUpTop ? 1 : 0, replyInfo);
               } else {
-                list[index].replies.add(replyInfo);
+                list[index]
+                  ..count += 1
+                  ..replies.add(replyInfo);
               }
               loadingState.refresh();
             }
@@ -204,7 +206,9 @@ abstract class ReplyController<R> extends CommonListController<R, ReplyInfo> {
     if (subIndex == null) {
       list.removeAt(index);
     } else {
-      list[index].replies.removeAt(subIndex);
+      list[index]
+        ..count -= 1
+        ..replies.removeAt(subIndex);
     }
     count.value -= 1;
     loadingState.refresh();

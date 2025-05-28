@@ -57,7 +57,7 @@ class _UpPanelState extends State<UpPanel> {
                   children: [
                     TextSpan(
                       text:
-                          'Live(${widget.dynamicsController.upData.value.liveUsers?.count})', // checked
+                          'Live(${widget.dynamicsController.upData.value.liveUsers?.count ?? 0})',
                     ),
                     if (!isTop) ...[
                       const TextSpan(text: '\n'),

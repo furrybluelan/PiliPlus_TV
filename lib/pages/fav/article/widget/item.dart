@@ -2,6 +2,7 @@ import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/button/icon_button.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/stat/stat.dart';
+import 'package:PiliPlus/models/fav_article/item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +13,7 @@ class FavArticleItem extends StatelessWidget {
     required this.onDelete,
   });
 
-  final dynamic item;
+  final FavArticleItemModel item;
   final VoidCallback onDelete;
 
   @override
@@ -27,7 +28,7 @@ class FavArticleItem extends StatelessWidget {
             onTap: () => Get.toNamed(
               '/articlePage',
               parameters: {
-                'id': item['opus_id'],
+                'id': item.opusId!.toString(),
                 'type': 'opus',
               },
             ),
@@ -40,14 +41,14 @@ class FavArticleItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (item['cover'] != null) ...[
+                  if (item.cover != null) ...[
                     AspectRatio(
                       aspectRatio: StyleString.aspectRatio,
                       child: LayoutBuilder(
                         builder: (BuildContext context,
                             BoxConstraints boxConstraints) {
                           return NetworkImgLayer(
-                            src: item['cover']['url'],
+                            src: item.cover!.url,
                             width: boxConstraints.maxWidth,
                             height: boxConstraints.maxHeight,
                           );
@@ -63,7 +64,7 @@ class FavArticleItem extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            item['content'],
+                            item.content!,
                             style: TextStyle(
                               fontSize: theme.textTheme.bodyMedium!.fontSize,
                               height: 1.42,
@@ -77,7 +78,7 @@ class FavArticleItem extends StatelessWidget {
                           children: [
                             // StatView(
                             //   context: context,
-                            //   value: item['stat']['view'],
+                            //   value: item.stat!.view!,
                             //   goto: 'picture',
                             //   textColor: theme.colorScheme.outline,
                             // ),
@@ -85,16 +86,15 @@ class FavArticleItem extends StatelessWidget {
                             StatView(
                               context: context,
                               goto: 'like',
-                              value: item['stat']['like'] == ''
-                                  ? 0
-                                  : item['stat']['like'],
+                              value:
+                                  item.stat!.like == '' ? 0 : item.stat!.like!,
                               textColor: theme.colorScheme.outline,
                             ),
                           ],
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          '${item['author']['name']} · ${item['pub_time']}',
+                          '${item.author!.name} · ${item.pubTime}',
                           maxLines: 1,
                           style: TextStyle(
                             fontSize: 13,

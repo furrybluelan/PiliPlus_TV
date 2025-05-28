@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'list.g.dart';
 
 @JsonSerializable()
-class FavList {
+class SpaceFavItemModel {
   int? id;
   int? fid;
   int? mid;
@@ -36,8 +36,14 @@ class FavList {
   int? type;
   String? link;
   String? bvid;
+  int? mediaId;
+  int? count;
+  int? isPublic;
 
-  FavList({
+  SpaceFavItemModel({
+    this.mediaId,
+    this.count,
+    this.isPublic,
     this.id,
     this.fid,
     this.mid,
@@ -63,7 +69,8 @@ class FavList {
     this.bvid,
   });
 
-  factory FavList.fromJson(Map<String, dynamic> json) => _$ListFromJson(json);
+  factory SpaceFavItemModel.fromJson(Map<String, dynamic> json) =>
+      _$ListFromJson(json);
 
   Map<String, dynamic> toJson() => _$ListToJson(this);
 }

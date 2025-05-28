@@ -10,7 +10,7 @@ MediaListResponse _$MediaListResponseFromJson(Map<String, dynamic> json) =>
     MediaListResponse(
       count: (json['count'] as num?)?.toInt(),
       list: (json['list'] as List<dynamic>?)
-          ?.map((item) => FavList.fromJson(item))
+          ?.map((item) => SpaceFavItemModel.fromJson(item))
           .toList(),
       hasMore: json['has_more'] as bool?,
     );

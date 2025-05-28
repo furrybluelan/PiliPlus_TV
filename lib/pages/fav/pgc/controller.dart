@@ -1,7 +1,7 @@
 import 'package:PiliPlus/http/bangumi.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/video.dart';
-import 'package:PiliPlus/models/bangumi/list.dart';
+import 'package:PiliPlus/models/pgc/list.dart';
 import 'package:PiliPlus/pages/common/multi_select_controller.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:flutter/material.dart';

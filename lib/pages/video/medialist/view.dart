@@ -138,9 +138,6 @@ class _MediaListPanelState
               widget.onDelete != null && widget.mediaList.length > 1;
           return ScrollablePositionedList.separated(
             itemScrollController: _scrollController,
-            // physics: const PositionRetainedScrollPhysics(
-            //   parent: ClampingScrollPhysics(),
-            // ),
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: widget.mediaList.length,
             padding: EdgeInsets.only(

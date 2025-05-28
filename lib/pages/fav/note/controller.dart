@@ -5,7 +5,7 @@ import 'package:PiliPlus/pages/common/multi_select_controller.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class FavNoteController
-    extends MultiSelectController<List<FavArticleModel>?, FavArticleModel> {
+    extends MultiSelectController<List<FavNoteModel>?, FavNoteModel> {
   FavNoteController(this.isPublish);
 
   final bool isPublish;
@@ -28,15 +28,15 @@ class FavNoteController
   }
 
   @override
-  Future<LoadingState<List<FavArticleModel>?>> customGetData() {
+  Future<LoadingState<List<FavNoteModel>?>> customGetData() {
     return isPublish
         ? VideoHttp.userNoteList(page: page)
         : VideoHttp.noteList(page: page);
   }
 
   Future<void> onRemove() async {
-    List<FavArticleModel> dataList = (loadingState.value as Success).response;
-    Set<FavArticleModel> removeList =
+    List<FavNoteModel> dataList = (loadingState.value as Success).response;
+    Set<FavNoteModel> removeList =
         dataList.where((item) => item.checked == true).toSet();
     final res = await VideoHttp.delNote(
       isPublish: isPublish,
@@ -45,7 +45,7 @@ class FavNoteController
           .toList(),
     );
     if (res['status']) {
-      List<FavArticleModel> remainList =
+      List<FavNoteModel> remainList =
           dataList.toSet().difference(removeList).toList();
       loadingState.value = Success(remainList);
       enableMultiSelect.value = false;

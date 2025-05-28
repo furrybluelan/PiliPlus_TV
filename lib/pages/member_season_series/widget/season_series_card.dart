@@ -2,6 +2,7 @@ import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/badge.dart';
 import 'package:PiliPlus/common/widgets/image/image_save.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
+import 'package:PiliPlus/models/member_ss/season.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -11,15 +12,15 @@ class SeasonSeriesCard extends StatelessWidget {
     required this.item,
     required this.onTap,
   });
-  final dynamic item;
+  final MemberSsModel item;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onLongPress: () => imageSaveDialog(
-        title: item['meta']['name'],
-        cover: item['meta']['cover'],
+        title: item.meta!.name,
+        cover: item.meta!.cover,
       ),
       onTap: onTap,
       child: Padding(
@@ -41,13 +42,13 @@ class SeasonSeriesCard extends StatelessWidget {
                     clipBehavior: Clip.none,
                     children: [
                       NetworkImgLayer(
-                        src: item['meta']['cover'],
+                        src: item.meta!.cover,
                         width: maxWidth,
                         height: maxHeight,
                       ),
                       PBadge(
                         text:
-                            '${item['meta']['season_id'] != null ? '合集' : '列表'}: ${item['meta']['total']}',
+                            '${item.meta!.seasonId != null ? '合集' : '列表'}: ${item.meta!.total}',
                         bottom: 6.0,
                         right: 6.0,
                       ),
@@ -71,7 +72,7 @@ class SeasonSeriesCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            item['meta']['name'],
+            item.meta!.name!,
             textAlign: TextAlign.start,
             style: TextStyle(
               fontSize: theme.textTheme.bodyMedium!.fontSize,
@@ -83,7 +84,7 @@ class SeasonSeriesCard extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            Utils.dateFormat(item['meta']['ptime']),
+            Utils.dateFormat(item.meta!.ptime),
             maxLines: 1,
             style: TextStyle(
               fontSize: 12,

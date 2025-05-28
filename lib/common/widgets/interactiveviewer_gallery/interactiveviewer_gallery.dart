@@ -45,7 +45,10 @@ class InteractiveviewerGallery<T> extends StatefulWidget {
     this.onDismissed,
     this.setStatusBar,
     this.onClose,
+    required this.quality,
   });
+
+  final int quality;
 
   final ValueChanged? onClose;
 
@@ -427,7 +430,7 @@ class _InteractiveviewerGalleryState extends State<InteractiveviewerGallery>
                 return CachedNetworkImage(
                   fadeInDuration: Duration.zero,
                   fadeOutDuration: Duration.zero,
-                  imageUrl: Utils.thumbnailImgUrl(item.url),
+                  imageUrl: Utils.thumbnailImgUrl(item.url, widget.quality),
                 );
               },
             ),

@@ -29,6 +29,7 @@ class _SubPageState extends State<SubPage> {
         child: refreshIndicator(
           onRefresh: _subController.onRefresh,
           child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               Obx(() => _buildBody(_subController.loadingState.value)),
               SliverToBoxAdapter(

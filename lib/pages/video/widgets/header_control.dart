@@ -33,7 +33,7 @@ import 'package:dio/dio.dart';
 import 'package:document_file_save_plus/document_file_save_plus_platform_interface.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -936,10 +936,11 @@ class HeaderControlState extends State<HeaderControl> {
         final theme = Theme.of(context);
 
         final sliderTheme = SliderThemeData(
+          trackHeight: 10,
           trackShape: MSliderTrackShape(),
           thumbColor: theme.colorScheme.primary,
           activeTrackColor: theme.colorScheme.primary,
-          trackHeight: 10,
+          inactiveTrackColor: theme.colorScheme.onInverseSurface,
           thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
         );
 
@@ -1274,10 +1275,11 @@ class HeaderControlState extends State<HeaderControl> {
         final theme = Theme.of(context);
 
         final sliderTheme = SliderThemeData(
+          trackHeight: 10,
           trackShape: MSliderTrackShape(),
           thumbColor: theme.colorScheme.primary,
           activeTrackColor: theme.colorScheme.primary,
-          trackHeight: 10,
+          inactiveTrackColor: theme.colorScheme.onInverseSurface,
           thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
         );
 

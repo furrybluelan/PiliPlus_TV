@@ -175,8 +175,8 @@ class OpusContent extends StatelessWidget {
                         callback!([pic.url!], 0);
                       } else {
                         context.imageView(
-                          initialPage: 0,
                           imgList: [SourceModel(url: pic.url!)],
+                          quality: 60,
                         );
                       }
                     },

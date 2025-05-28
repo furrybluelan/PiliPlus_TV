@@ -11,6 +11,7 @@ import 'package:PiliPlus/http/video.dart';
 import 'package:PiliPlus/models/user/fav_folder.dart';
 import 'package:PiliPlus/models/video/ai.dart';
 import 'package:PiliPlus/models/video_detail_res.dart';
+import 'package:PiliPlus/models/video_tag/data.dart';
 import 'package:PiliPlus/pages/dynamics_repost/view.dart';
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/pay_coins/view.dart';
@@ -50,7 +51,7 @@ class VideoIntroController extends GetxController {
   // up主粉丝数
   RxMap<String, dynamic> userStat = RxMap<String, dynamic>({'follower': '-'});
 
-  dynamic videoTags;
+  List<VideoTagItem>? videoTags;
 
   // 是否点赞
   RxBool hasLike = false.obs;
@@ -187,6 +188,7 @@ class VideoIntroController extends GetxController {
   }
 
   Future<void> queryVideoTags() async {
+    videoTags = null;
     var result = await UserHttp.videoTags(bvid: bvid);
     if (result['status']) {
       videoTags = result['data'];

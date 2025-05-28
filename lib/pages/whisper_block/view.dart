@@ -6,6 +6,7 @@ import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/pages/search/widgets/search_text.dart';
 import 'package:PiliPlus/pages/whisper_block/controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
@@ -195,6 +196,7 @@ class _WhisperBlockPageState extends State<WhisperBlockPage> {
                   fillColor: theme.colorScheme.onInverseSurface,
                 ),
                 onChanged: (value) => keyword = value,
+                inputFormatters: [LengthLimitingTextInputFormatter(20)],
               ),
               const SizedBox(height: 12),
               FilledButton.tonal(

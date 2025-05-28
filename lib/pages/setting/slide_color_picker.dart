@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart'
+    show LengthLimitingTextInputFormatter, FilteringTextInputFormatter;
 import 'package:get/get.dart';
 
 class SlideColorPicker extends StatefulWidget {
@@ -53,20 +54,35 @@ class _SlideColorPickerState extends State<SlideColorPicker> {
     return Row(
       children: [
         const SizedBox(width: 16),
-        Text(title),
+        SizedBox(
+          width: MediaQuery.textScalerOf(context).scale(16),
+          child: Text(title),
+        ),
+        const SizedBox(width: 12),
         Expanded(
-          child: Slider(
-            min: 0,
-            max: 255,
-            divisions: 255,
-            value: value.toDouble(),
-            onChanged: onChanged,
+          child: SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 10,
+              thumbSize: WidgetStateProperty.all(const Size(4, 25)),
+            ),
+            child: Slider(
+              padding: EdgeInsets.zero,
+              min: 0,
+              max: 255,
+              divisions: 255,
+              value: value.toDouble(),
+              onChanged: onChanged,
+            ),
           ),
         ),
-        Text(
-          value.toString(),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: MediaQuery.textScalerOf(context).scale(25) + 16,
+          child: Text(
+            value.toString(),
+            textAlign: TextAlign.start,
+          ),
         ),
-        const SizedBox(width: 16),
       ],
     );
   }

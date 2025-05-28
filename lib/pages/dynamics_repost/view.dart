@@ -1,6 +1,8 @@
 import 'package:PiliPlus/common/widgets/button/toolbar_icon_button.dart';
+import 'package:PiliPlus/common/widgets/draggable_sheet/draggable_scrollable_sheet_dyn.dart'
+    show DraggableScrollableSheet;
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
-import 'package:PiliPlus/http/msg.dart';
+import 'package:PiliPlus/http/dynamics.dart';
 import 'package:PiliPlus/models/common/publish_panel_type.dart';
 import 'package:PiliPlus/models/dynamics/result.dart';
 import 'package:PiliPlus/pages/common/common_publish_page.dart';
@@ -9,7 +11,8 @@ import 'package:PiliPlus/pages/emote/view.dart';
 import 'package:PiliPlus/utils/extension.dart';
 import 'package:PiliPlus/utils/request_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DraggableScrollableSheet;
+import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
@@ -46,6 +49,9 @@ class RepostPanel extends CommonPublishPage {
 
 class _RepostPanelState extends CommonPublishPageState<RepostPanel> {
   late bool _isMax = widget.isMax ?? false;
+  bool? _isExpanded;
+
+  late final _key = GlobalKey();
 
   late final _pic = widget.pic ??
       widget.item?.modules.moduleDynamic?.major?.archive?.cover ??
@@ -72,129 +78,149 @@ class _RepostPanelState extends CommonPublishPageState<RepostPanel> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return AnimatedSize(
-      alignment: Alignment.topCenter,
-      curve: Curves.ease,
-      duration: const Duration(milliseconds: 300),
-      child: Column(
-        mainAxisSize: _isMax ? MainAxisSize.max : MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: _isMax ? 16 : 10),
-          _buildAppBar(theme),
-          if (_isMax) ...[
-            Expanded(child: _buildEditPanel(theme)),
-            _buildToolbar,
-            buildPanelContainer(Colors.transparent),
-          ] else ...[
-            _buildEditPanel(theme),
-            ..._biuldDismiss(theme),
+
+    Widget page([ScrollController? scrollController]) => Column(
+          key: _isMax ? _key : null,
+          mainAxisSize: _isMax ? MainAxisSize.max : MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _isMax ? const SizedBox(height: 16) : const SizedBox(height: 10),
+            _buildAppBar(theme),
+            if (_isMax) ...[
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  controller: scrollController,
+                  physics: const ClampingScrollPhysics(),
+                  children: _buildEditPanel(theme),
+                ),
+              ),
+              _buildToolbar,
+              buildPanelContainer(Colors.transparent),
+            ] else ...[
+              ..._buildEditPanel(theme),
+              ..._biuldDismiss(theme),
+            ],
           ],
-        ],
-      ),
-    );
+        );
+
+    Widget child() => _isMax
+        ? DraggableScrollableSheet(
+            snap: true,
+            expand: false,
+            initialChildSize: 1,
+            minChildSize: 0,
+            maxChildSize: 1,
+            snapSizes: const [1],
+            builder: (context, scrollController) => page(scrollController),
+          )
+        : page();
+
+    return _isExpanded == true
+        ? child()
+        : AnimatedSize(
+            alignment: Alignment.topCenter,
+            curve: Curves.ease,
+            duration: const Duration(milliseconds: 300),
+            child: child(),
+          );
   }
 
-  Widget _buildEditPanel(ThemeData theme) => Column(
-        mainAxisSize: _isMax ? MainAxisSize.max : MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                width: double.infinity,
-                decoration: _isMax.not
-                    ? BoxDecoration(
-                        border: Border(
-                          left: BorderSide(
-                            width: 2,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      )
-                    : null,
-                child: _isMax.not
-                    ? _buildEditPlaceHolder(theme)
-                    : _buildEditWidget,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _buildRefWidget(theme),
-        ],
-      );
-
-  Widget _buildRefWidget(ThemeData theme) => Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHigh ==
-                  theme.colorScheme.surface
-              ? theme.colorScheme.onInverseSurface
-              : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-        ),
-        child: Row(
-          children: [
-            if (_pic != null) ...[
-              NetworkImgLayer(
-                radius: 6,
-                width: 40,
-                height: 40,
-                src: _pic,
-              ),
-              const SizedBox(width: 10),
-            ],
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_uname?.isNotEmpty == true)
-                    Text(
-                      '@$_uname',
-                      style: TextStyle(
+  List<Widget> _buildEditPanel(ThemeData theme) => [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _isMax
+              ? _buildEditWidget(theme)
+              : DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        width: 2,
                         color: theme.colorScheme.primary,
-                        fontSize: 13,
                       ),
                     ),
-                  Text(
-                    _text,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
+                  child: _buildEditPlaceHolder(theme),
+                ),
+        ),
+        const SizedBox(height: 10),
+        _buildRefWidget(theme),
+      ];
+
+  Widget _buildRefWidget(ThemeData theme) => Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              if (_pic != null) ...[
+                NetworkImgLayer(
+                  radius: 6,
+                  width: 40,
+                  height: 40,
+                  src: _pic,
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_uname?.isNotEmpty == true)
+                      Text(
+                        '@$_uname',
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    Text(
+                      _text,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 
   Widget _buildEditPlaceHolder(ThemeData theme) => GestureDetector(
-        onTap: () async {
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
           setState(() => _isMax = true);
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (mounted) {
-            focusNode.requestFocus();
-          }
+          Future.delayed(const Duration(milliseconds: 300), () {
+            _isExpanded = true;
+            if (mounted) {
+              focusNode.requestFocus();
+            }
+          });
         },
-        child: Text(
-          '说点什么吧',
-          style: TextStyle(
-            height: 1.75,
-            fontSize: 15,
-            color: theme.colorScheme.outline,
+        child: SizedBox(
+          width: double.infinity,
+          child: Text(
+            '说点什么吧',
+            style: TextStyle(
+              height: 1.75,
+              fontSize: 15,
+              color: theme.colorScheme.outline,
+            ),
           ),
         ),
       );
 
-  Widget get _buildEditWidget => Form(
+  Widget _buildEditWidget(ThemeData theme) => Form(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Listener(
           onPointerUp: (event) {
             if (readOnly.value) {
               updatePanelType(PanelType.keyboard);
-              selectKeyboard.value = true;
             }
           },
           child: Obx(
@@ -204,14 +230,16 @@ class _RepostPanelState extends CommonPublishPageState<RepostPanel> {
               maxLines: null,
               focusNode: focusNode,
               readOnly: readOnly.value,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '说点什么吧',
-                border: OutlineInputBorder(
+                hintStyle: TextStyle(color: theme.colorScheme.outline),
+                border: const OutlineInputBorder(
                   borderSide: BorderSide.none,
                   gapPadding: 0,
                 ),
-                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
+              inputFormatters: [LengthLimitingTextInputFormatter(1000)],
             ),
           ),
         ),
@@ -296,24 +324,19 @@ class _RepostPanelState extends CommonPublishPageState<RepostPanel> {
 
   Widget get _buildToolbar => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            Obx(
-              () => ToolbarIconButton(
-                onPressed: () {
-                  selectKeyboard.value = PanelType.emoji == currentPanelType;
-                  updatePanelType(
-                    PanelType.emoji == currentPanelType
-                        ? PanelType.keyboard
-                        : PanelType.emoji,
-                  );
-                },
-                icon: const Icon(Icons.emoji_emotions, size: 22),
-                tooltip: '表情',
-                selected: !selectKeyboard.value,
-              ),
-            ),
-          ],
+        child: Obx(
+          () => ToolbarIconButton(
+            onPressed: () {
+              updatePanelType(
+                panelType.value == PanelType.emoji
+                    ? PanelType.keyboard
+                    : PanelType.emoji,
+              );
+            },
+            icon: const Icon(Icons.emoji_emotions, size: 22),
+            tooltip: '表情',
+            selected: panelType.value == PanelType.emoji,
+          ),
         ),
       );
 
@@ -339,15 +362,56 @@ class _RepostPanelState extends CommonPublishPageState<RepostPanel> {
   @override
   Widget? get customPanel => EmotePanel(onChoose: onChooseEmote);
 
+  List<Map<String, dynamic>>? extraContent(DynamicItemModel item) {
+    try {
+      return [
+        {"raw_text": "//", "type": 1, "biz_id": ""},
+        {
+          "raw_text": "@${item.modules.moduleAuthor!.name}",
+          "type": 2,
+          "biz_id": item.modules.moduleAuthor!.mid.toString(),
+        },
+        {"raw_text": ":", "type": 1, "biz_id": ""},
+        ...item.modules.moduleDynamic!.desc!.richTextNodes!.map(
+          (e) {
+            int? type;
+            String? bizId;
+            switch (e.type) {
+              case 'RICH_TEXT_NODE_TYPE_EMOJI':
+                type = 9;
+                bizId = '';
+              case 'RICH_TEXT_NODE_TYPE_AT':
+                type = 2;
+                bizId = e.rid;
+              case 'RICH_TEXT_NODE_TYPE_TEXT':
+              default:
+                type = 1;
+                bizId = '';
+            }
+            return {
+              "raw_text": e.origText,
+              "type": type,
+              "biz_id": bizId,
+            };
+          },
+        ),
+      ];
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   Future<void> onCustomPublish(
       {required String message, List? pictures}) async {
-    dynamic result = await MsgHttp.createDynamic(
+    var result = await DynamicsHttp.createDynamic(
       mid: Accounts.main.mid,
       dynIdStr: widget.item?.idStr ?? widget.dynIdStr,
       rid: widget.rid,
       dynType: widget.dynType,
       rawText: editController.text,
+      extraContent:
+          widget.item?.orig != null ? extraContent(widget.item!) : null,
     );
     if (result['status']) {
       Get.back();

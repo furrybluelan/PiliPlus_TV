@@ -6,7 +6,11 @@ part of 'list.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-FavList _$ListFromJson(Map<String, dynamic> json) => FavList(
+SpaceFavItemModel _$ListFromJson(Map<String, dynamic> json) =>
+    SpaceFavItemModel(
+      mediaId: (json['media_id'] as num?)?.toInt(),
+      count: (json['count'] as num?)?.toInt(),
+      isPublic: (json['is_public'] as num?)?.toInt(),
       id: (json['id'] as num?)?.toInt(),
       fid: (json['fid'] as num?)?.toInt(),
       mid: (json['mid'] as num?)?.toInt(),
@@ -34,7 +38,8 @@ FavList _$ListFromJson(Map<String, dynamic> json) => FavList(
       bvid: json['bvid'] as String?,
     );
 
-Map<String, dynamic> _$ListToJson(FavList instance) => <String, dynamic>{
+Map<String, dynamic> _$ListToJson(SpaceFavItemModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'fid': instance.fid,
       'mid': instance.mid,

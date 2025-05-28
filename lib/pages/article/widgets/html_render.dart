@@ -55,6 +55,7 @@ Widget htmlRender({
                 } else {
                   context.imageView(
                     imgList: [SourceModel(url: imgUrl)],
+                    quality: 60,
                   );
                 }
               },

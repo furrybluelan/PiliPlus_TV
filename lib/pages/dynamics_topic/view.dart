@@ -46,6 +46,7 @@ class _DynTopicPageState extends State<DynTopicPage> {
           onRefresh: _controller.onRefresh,
           child: CustomScrollView(
             controller: _controller.scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               Obx(() => _buildAppBar(theme, _controller.topState.value)),
               Obx(() {

@@ -141,9 +141,7 @@ class _ReasonFieldState extends State<ReasonField> {
           border: OutlineInputBorder(),
           contentPadding: EdgeInsets.all(10),
         ),
-        onChanged: (value) {
-          widget.onChanged(value);
-        },
+        onChanged: widget.onChanged,
         validator: widget._validator,
       ),
     );

@@ -12,6 +12,7 @@ import 'package:PiliPlus/models/common/audio_normalization.dart';
 import 'package:PiliPlus/models/common/sponsor_block/segment_type.dart';
 import 'package:PiliPlus/models/common/sponsor_block/skip_type.dart';
 import 'package:PiliPlus/models/user/danmaku_rule.dart';
+import 'package:PiliPlus/models/video_shot/data.dart';
 import 'package:PiliPlus/pages/mine/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
@@ -510,7 +511,7 @@ class PlPlayerController {
     List<Segment>? segmentList,
     List<Segment>? viewPointList,
     bool? showVP,
-    List? dmTrend,
+    List<double>? dmTrend,
     bool autoplay = true,
     // 默认不循环
     PlaylistMode looping = PlaylistMode.none,
@@ -536,7 +537,7 @@ class PlPlayerController {
       this.segmentList.value = segmentList ?? <Segment>[];
       this.viewPointList.value = viewPointList ?? <Segment>[];
       this.showVP.value = showVP ?? true;
-      this.dmTrend.value = dmTrend ?? [];
+      this.dmTrend.value = dmTrend ?? <double>[];
       _autoPlay = autoplay;
       _looping = looping;
       // 初始化视频倍速
@@ -1600,18 +1601,19 @@ class PlPlayerController {
       if (res.data['code'] == 0) {
         videoShot = {
           'status': true,
-          'data': res.data['data'],
+          'data': VideoShotData.fromJson(res.data['data']),
         };
       } else {
         videoShot = {'status': false};
       }
     } catch (e) {
+      videoShot = {'status': false};
       debugPrint('getVideoShot: $e');
     }
     _isQueryingVideoShot = false;
   }
 
-  late final RxList dmTrend = [].obs;
+  late final RxList<double> dmTrend = <double>[].obs;
   late final RxBool showDmTreandChart = true.obs;
 }
 

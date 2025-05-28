@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:PiliPlus/models/bangumi/info.dart';
+import 'package:PiliPlus/models/pgc/info.dart';
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/utils.dart';

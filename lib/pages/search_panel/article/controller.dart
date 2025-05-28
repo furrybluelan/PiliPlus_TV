@@ -67,7 +67,7 @@ class SearchArticleController
       isScrollControlled: true,
       clipBehavior: Clip.hardEdge,
       constraints: BoxConstraints(
-        maxWidth: min(640, min(Get.width, Get.height)),
+        maxWidth: min(640, context.mediaQueryShortestSide),
       ),
       builder: (context) {
         final theme = Theme.of(context);

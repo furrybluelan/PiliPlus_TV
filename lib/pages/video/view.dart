@@ -10,10 +10,11 @@ import 'package:PiliPlus/grpc/bilibili/main/community/reply/v1.pb.dart'
     show ReplyInfo;
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/main.dart';
-import 'package:PiliPlus/models/bangumi/info.dart' as bangumi;
 import 'package:PiliPlus/models/common/episode_panel_type.dart';
 import 'package:PiliPlus/models/common/search_type.dart';
+import 'package:PiliPlus/models/pgc/info.dart' as bangumi;
 import 'package:PiliPlus/models/video_detail_res.dart' as video;
+import 'package:PiliPlus/models/video_tag/data.dart';
 import 'package:PiliPlus/pages/danmaku/view.dart';
 import 'package:PiliPlus/pages/episode_panel/view.dart';
 import 'package:PiliPlus/pages/video/ai/view.dart';
@@ -54,7 +55,7 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -108,6 +109,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   final GlobalKey relatedVideoPanelKey = GlobalKey();
   final GlobalKey videoPlayerKey = GlobalKey();
   final GlobalKey videoReplyPanelKey = GlobalKey();
+  late final GlobalKey ugcPanelKey = GlobalKey();
+  late final GlobalKey pgcPanelKey = GlobalKey();
 
   @override
   void initState() {
@@ -1797,6 +1800,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
             slivers: [
               if (videoDetailController.videoType == SearchType.video) ...[
                 VideoIntroPanel(
+                  key: ugcPanelKey,
                   heroTag: heroTag,
                   showAiBottomSheet: showAiBottomSheet,
                   showEpisodes: showEpisodes,
@@ -1831,6 +1835,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                   SearchType.media_bangumi)
                 Obx(
                   () => BangumiIntroPanel(
+                    key: pgcPanelKey,
                     heroTag: heroTag,
                     cid: videoDetailController.cid.value,
                     showEpisodes: showEpisodes,
@@ -1917,6 +1922,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                 child: Obx(
                   () => EpisodePanel(
                     heroTag: heroTag,
+                    enableSlide: false,
                     videoIntroController: videoIntroController,
                     type: EpisodeType.part,
                     list: [videoIntroController.videoDetail.value.pages!],
@@ -1964,6 +1970,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
               child: Obx(
                 () => EpisodePanel(
                   heroTag: heroTag,
+                  enableSlide: false,
                   videoIntroController: videoIntroController,
                   type: EpisodeType.season,
                   initialTabIndex: videoDetailController.seasonIndex.value,
@@ -2071,7 +2078,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     );
   }
 
-  void showIntroDetail(videoDetail, videoTags) {
+  void showIntroDetail(
+      bangumi.BangumiInfoModel videoDetail, List<VideoTagItem>? videoTags) {
     videoDetailController.childKey.currentState?.showBottomSheet(
       backgroundColor: Colors.transparent,
       (context) => bangumi.IntroDetail(

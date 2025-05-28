@@ -33,7 +33,7 @@ class _WebviewPageState extends State<WebviewPage> {
   final RxString title = ''.obs;
   final RxDouble progress = 1.0.obs;
   bool? _inApp;
-  bool? _off;
+  bool _off = false;
 
   InAppWebViewController? _webViewController;
 
@@ -42,7 +42,7 @@ class _WebviewPageState extends State<WebviewPage> {
     super.initState();
     if (Get.arguments is Map) {
       _inApp = Get.arguments['inApp'];
-      _off = Get.arguments['off'];
+      _off = Get.arguments['off'] ?? false;
     }
   }
 
@@ -282,7 +282,7 @@ class _WebviewPageState extends State<WebviewPage> {
             bool hasMatch = await PiliScheme.routePush(
               navigationAction.request.url?.uriValue ?? Uri(),
               selfHandle: true,
-              off: _off ?? true,
+              off: _off,
             );
             // debugPrint('webview: [$url], [$hasMatch]');
             if (hasMatch) {

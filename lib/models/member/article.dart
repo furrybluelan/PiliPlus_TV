@@ -1,7 +1,7 @@
 import 'package:PiliPlus/pages/common/multi_select_controller.dart';
 
-class FavArticleModel with MultiSelectData {
-  FavArticleModel({
+class FavNoteModel with MultiSelectData {
+  FavNoteModel({
     this.webUrl,
     this.title,
     this.summary,
@@ -19,7 +19,7 @@ class FavArticleModel with MultiSelectData {
   dynamic cvid;
   dynamic noteId;
 
-  FavArticleModel.fromJson(Map json) {
+  FavNoteModel.fromJson(Map json) {
     webUrl = json['web_url'];
     title = json['title'];
     summary = json['summary'];

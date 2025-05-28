@@ -1,5 +1,8 @@
 import 'package:PiliPlus/pages/fav/pgc/child_view.dart';
+import 'package:PiliPlus/pages/fav/pgc/controller.dart';
+import 'package:PiliPlus/utils/extension.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class FavPgcPage extends StatefulWidget {
   const FavPgcPage({super.key, required this.type});
@@ -61,6 +64,15 @@ class _FavPgcPageState extends State<FavPgcPage>
                   Tab(text: '在看'),
                   Tab(text: '看过'),
                 ],
+                onTap: (index) {
+                  try {
+                    if (!_tabController.indexIsChanging) {
+                      Get.find<FavPgcController>(
+                        tag: '${widget.type}${index + 1}',
+                      ).scrollController.animToTop();
+                    }
+                  } catch (_) {}
+                },
               ),
             ),
             // TextButton(

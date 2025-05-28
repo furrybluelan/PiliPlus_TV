@@ -14,6 +14,7 @@ import 'package:PiliPlus/models/member/coin.dart';
 import 'package:PiliPlus/models/member/info.dart';
 import 'package:PiliPlus/models/member/seasons.dart';
 import 'package:PiliPlus/models/member/tags.dart';
+import 'package:PiliPlus/models/member_ss/item.dart';
 import 'package:PiliPlus/models/space/data.dart';
 import 'package:PiliPlus/models/space_archive/data.dart';
 import 'package:PiliPlus/models/space_article/data.dart';
@@ -112,7 +113,7 @@ class MemberHttp {
     }
   }
 
-  static Future<LoadingState> seasonSeriesList({
+  static Future<LoadingState<MemberSsData>> seasonSeriesList({
     required int? mid,
     required int pn,
   }) async {
@@ -125,7 +126,8 @@ class MemberHttp {
       },
     );
     if (res.data['code'] == 0) {
-      return Success(res.data['data']?['items_lists']);
+      return Success(
+          MemberSsData.fromJson(res.data['data']?['items_lists'] ?? {}));
     } else {
       return Error(res.data['message']);
     }

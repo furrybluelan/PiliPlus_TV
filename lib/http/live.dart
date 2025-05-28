@@ -147,9 +147,13 @@ class LiveHttp {
   }
 
   static Future liveRoomGetDanmakuToken({roomId}) async {
-    var res = await Request().get(Api.liveRoomDmToken, queryParameters: {
-      'id': roomId,
-    });
+    var res = await Request().get(
+      Api.liveRoomDmToken,
+      queryParameters: await WbiSign.makSign({
+        'id': roomId,
+        'web_location': 444.8,
+      }),
+    );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': LiveDanmakuInfo.fromJson(res.data)};
     } else {

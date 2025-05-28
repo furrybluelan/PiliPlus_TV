@@ -15,27 +15,6 @@ Widget content(
   Function(List<String>, int)? callback, {
   floor = 1,
 }) {
-  InlineSpan picsNodes() {
-    return WidgetSpan(
-      child: LayoutBuilder(
-        builder: (context, constraints) => imageView(
-          constraints.maxWidth,
-          (item.modules.moduleDynamic!.major!.opus!.pics as List)
-              .map(
-                (item) => ImageModel(
-                  width: item.width,
-                  height: item.height,
-                  url: item.url ?? '',
-                  liveUrl: item.liveUrl,
-                ),
-              )
-              .toList(),
-          callback: callback,
-        ),
-      ),
-    );
-  }
-
   TextSpan? richNodes = richNode(theme, item, context);
 
   return Padding(
@@ -72,13 +51,17 @@ Widget content(
                 ],
               ),
               style: TextStyle(
-                fontSize: source == 'detail' && !isSave ? 16 : 15,
+                fontSize: floor != 1
+                    ? 14
+                    : source == 'detail' && !isSave
+                        ? 16
+                        : 15,
                 color: theme.colorScheme.primary,
               ),
             ),
           ),
         if (richNodes != null)
-          source == 'detail'
+          source == 'detail' && floor == 1
               ? SelectableText.rich(
                   richNodes,
                   style: isSave
@@ -86,13 +69,34 @@ Widget content(
                       : const TextStyle(fontSize: 16),
                 )
               : Text.rich(
-                  style: const TextStyle(fontSize: 15),
+                  style: floor == 1
+                      ? const TextStyle(fontSize: 15)
+                      : const TextStyle(fontSize: 14),
                   richNodes,
-                  maxLines: 6,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: isSave ? null : 6,
+                  overflow: isSave ? null : TextOverflow.ellipsis,
                 ),
         if (item.modules.moduleDynamic?.major?.opus?.pics?.isNotEmpty == true)
-          Text.rich(picsNodes()),
+          Text.rich(
+            WidgetSpan(
+              child: LayoutBuilder(
+                builder: (context, constraints) => imageView(
+                  constraints.maxWidth,
+                  (item.modules.moduleDynamic!.major!.opus!.pics as List)
+                      .map(
+                        (item) => ImageModel(
+                          width: item.width,
+                          height: item.height,
+                          url: item.url ?? '',
+                          liveUrl: item.liveUrl,
+                        ),
+                      )
+                      .toList(),
+                  callback: callback,
+                ),
+              ),
+            ),
+          ),
       ],
     ),
   );

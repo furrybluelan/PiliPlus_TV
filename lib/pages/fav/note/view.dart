@@ -1,5 +1,8 @@
 import 'package:PiliPlus/pages/fav/note/child_view.dart';
+import 'package:PiliPlus/pages/fav/note/controller.dart';
+import 'package:PiliPlus/utils/extension.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class FavNotePage extends StatefulWidget {
   const FavNotePage({super.key});
@@ -58,6 +61,16 @@ class _FavNotePageState extends State<FavNotePage>
                   const Tab(text: '未发布笔记'),
                   const Tab(text: '公开笔记'),
                 ],
+                onTap: (index) {
+                  try {
+                    if (!_tabController.indexIsChanging) {
+                      Get.find<FavNoteController>(
+                              tag: index == 0 ? 'false' : 'true')
+                          .scrollController
+                          .animToTop();
+                    }
+                  } catch (_) {}
+                },
               ),
             ),
             // TextButton(

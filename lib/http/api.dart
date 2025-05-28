@@ -855,4 +855,21 @@ class Api {
   static const String delFavTopic = '/x/topic/fav/sub/cancel';
 
   static const String likeTopic = '/x/topic/like';
+
+  static const String pgcReviewL = '/pgc/review/long/list';
+
+  static const String pgcReviewS = '/pgc/review/short/list';
+
+  static const String pgcReviewLike = '/pgc/review/action/like';
+
+  static const String pgcReviewDislike = '/pgc/review/action/dislike';
+
+  static const String pgcReviewPost = '/pgc/review/short/post';
+
+  static const String pgcReviewMod = '/pgc/review/short/modify';
+
+  static const String pgcReviewDel = '/pgc/review/short/del';
+
+  static const String topicPubSearch =
+      '${HttpString.appBaseUrl}/x/topic/pub/search';
 }

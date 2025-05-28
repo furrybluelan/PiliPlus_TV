@@ -92,16 +92,19 @@ class _ReplyPageState extends CommonPublishPageState<ReplyPage> {
         if (pathList.isNotEmpty) {
           return Container(
             height: 85,
+            width: double.infinity,
             padding: const EdgeInsets.only(bottom: 10),
-            child: ListView.separated(
+            child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
               padding: const EdgeInsets.symmetric(horizontal: 15),
-              itemCount: pathList.length,
-              itemBuilder: (context, index) => buildImage(index, 75),
-              separatorBuilder: (context, index) => const SizedBox(width: 10),
+              child: Row(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(
+                  pathList.length,
+                  (index) => buildImage(index, 75),
+                ),
+              ),
             ),
           );
         } else {
@@ -122,7 +125,6 @@ class _ReplyPageState extends CommonPublishPageState<ReplyPage> {
             onPointerUp: (event) {
               if (readOnly.value) {
                 updatePanelType(PanelType.keyboard);
-                selectKeyboard.value = true;
               }
             },
             child: Obx(
@@ -167,13 +169,12 @@ class _ReplyPageState extends CommonPublishPageState<ReplyPage> {
               () => ToolbarIconButton(
                 tooltip: '输入',
                 onPressed: () {
-                  if (!selectKeyboard.value) {
-                    selectKeyboard.value = true;
+                  if (panelType.value != PanelType.keyboard) {
                     updatePanelType(PanelType.keyboard);
                   }
                 },
                 icon: const Icon(Icons.keyboard, size: 22),
-                selected: selectKeyboard.value,
+                selected: panelType.value == PanelType.keyboard,
               ),
             ),
             const SizedBox(width: 10),
@@ -181,13 +182,12 @@ class _ReplyPageState extends CommonPublishPageState<ReplyPage> {
               () => ToolbarIconButton(
                 tooltip: '表情',
                 onPressed: () {
-                  if (selectKeyboard.value) {
-                    selectKeyboard.value = false;
+                  if (panelType.value != PanelType.emoji) {
                     updatePanelType(PanelType.emoji);
                   }
                 },
                 icon: const Icon(Icons.emoji_emotions, size: 22),
-                selected: !selectKeyboard.value,
+                selected: panelType.value == PanelType.emoji,
               ),
             ),
             if (widget.root == 0) ...[

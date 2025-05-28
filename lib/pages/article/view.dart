@@ -249,102 +249,109 @@ class _ArticlePageState extends State<ArticlePage>
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: _buildAppBar,
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SafeArea(
-            top: false,
-            bottom: false,
-            child: Builder(
-              builder: (context) {
-                final isPortrait = context.orientation == Orientation.portrait;
-                double padding =
-                    max(context.width / 2 - Grid.smallCardWidth, 0);
-                if (isPortrait) {
-                  return LayoutBuilder(builder: (context, constraints) {
-                    final maxWidth = constraints.maxWidth - 2 * padding - 24;
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: padding),
-                      child: CustomScrollView(
-                        controller: _articleCtr.scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: [
-                          _buildContent(theme, maxWidth),
-                          SliverToBoxAdapter(
-                            child: Divider(
-                              thickness: 8,
-                              color: theme.dividerColor.withValues(alpha: 0.05),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SafeArea(
+              top: false,
+              bottom: false,
+              child: Builder(
+                builder: (context) {
+                  final isPortrait =
+                      context.orientation == Orientation.portrait;
+                  double padding =
+                      max(context.width / 2 - Grid.smallCardWidth, 0);
+                  if (isPortrait) {
+                    return LayoutBuilder(builder: (context, constraints) {
+                      final maxWidth = constraints.maxWidth - 2 * padding - 24;
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: padding),
+                        child: CustomScrollView(
+                          controller: _articleCtr.scrollController,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          slivers: [
+                            _buildContent(theme, maxWidth),
+                            SliverToBoxAdapter(
+                              child: Divider(
+                                thickness: 8,
+                                color:
+                                    theme.dividerColor.withValues(alpha: 0.05),
+                              ),
                             ),
-                          ),
-                          _buildReplyHeader(theme),
-                          Obx(() => _buildReplyList(
-                              theme, _articleCtr.loadingState.value)),
-                        ],
-                      ),
-                    );
-                  });
-                } else {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: _ratio[0].toInt(),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final maxWidth =
-                                constraints.maxWidth - padding / 4 - 24;
-                            return CustomScrollView(
-                              controller: _articleCtr.scrollController,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              slivers: [
-                                SliverPadding(
-                                  padding: EdgeInsets.only(
-                                    left: padding / 4,
-                                    bottom:
-                                        MediaQuery.paddingOf(context).bottom +
-                                            80,
-                                  ),
-                                  sliver: _buildContent(theme, maxWidth),
-                                ),
-                              ],
-                            );
-                          },
+                            _buildReplyHeader(theme),
+                            Obx(() => _buildReplyList(
+                                theme, _articleCtr.loadingState.value)),
+                          ],
                         ),
-                      ),
-                      VerticalDivider(
-                        thickness: 8,
-                        color: theme.dividerColor.withValues(alpha: 0.05),
-                      ),
-                      Expanded(
-                        flex: _ratio[1].toInt(),
-                        child: Scaffold(
-                          key: _key,
-                          backgroundColor: Colors.transparent,
-                          body: refreshIndicator(
-                            onRefresh: _articleCtr.onRefresh,
-                            child: Padding(
-                              padding: EdgeInsets.only(right: padding / 4),
-                              child: CustomScrollView(
+                      );
+                    });
+                  } else {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: _ratio[0].toInt(),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final maxWidth =
+                                  constraints.maxWidth - padding / 4 - 24;
+                              return CustomScrollView(
                                 controller: _articleCtr.scrollController,
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 slivers: [
-                                  _buildReplyHeader(theme),
-                                  Obx(() => _buildReplyList(
-                                      theme, _articleCtr.loadingState.value)),
+                                  SliverPadding(
+                                    padding: EdgeInsets.only(
+                                      left: padding / 4,
+                                      bottom:
+                                          MediaQuery.paddingOf(context).bottom +
+                                              80,
+                                    ),
+                                    sliver: _buildContent(theme, maxWidth),
+                                  ),
                                 ],
+                              );
+                            },
+                          ),
+                        ),
+                        VerticalDivider(
+                          thickness: 8,
+                          color: theme.dividerColor.withValues(alpha: 0.05),
+                        ),
+                        Expanded(
+                          flex: _ratio[1].toInt(),
+                          child: Scaffold(
+                            key: _key,
+                            backgroundColor: Colors.transparent,
+                            body: refreshIndicator(
+                              onRefresh: _articleCtr.onRefresh,
+                              child: Padding(
+                                padding: EdgeInsets.only(right: padding / 4),
+                                child: CustomScrollView(
+                                  controller: _articleCtr.scrollController,
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  slivers: [
+                                    _buildReplyHeader(theme),
+                                    Obx(() => _buildReplyList(
+                                        theme, _articleCtr.loadingState.value)),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }
-              },
+                      ],
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-          _buildBottom(theme),
-        ],
+            _buildBottom(theme),
+          ],
+        ),
       ),
     );
   }

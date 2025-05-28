@@ -80,6 +80,15 @@ class _MemberSearchPageState extends State<MemberSearchPage> {
                           ),
                         ),
                       ],
+                      onTap: (index) {
+                        if (!_controller.tabController.indexIsChanging) {
+                          if (index == 0) {
+                            _controller.arcCtr.animateToTop();
+                          } else {
+                            _controller.dynCtr.animateToTop();
+                          }
+                        }
+                      },
                     ),
                     Expanded(
                       child: tabBarView(

@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 class MemberFavItem extends StatelessWidget {
   const MemberFavItem({super.key, required this.item, this.callback});
 
-  final FavList item;
+  final SpaceFavItemModel item;
   final ValueChanged<bool?>? callback;
 
   @override

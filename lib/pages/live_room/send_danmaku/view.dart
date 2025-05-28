@@ -8,7 +8,7 @@ import 'package:PiliPlus/pages/live_emote/controller.dart';
 import 'package:PiliPlus/pages/live_emote/view.dart';
 import 'package:PiliPlus/pages/live_room/controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart' hide MultipartFile;
 
@@ -35,7 +35,6 @@ class _ReplyPageState extends CommonPublishPageState<LiveSendDmPanel> {
   void initState() {
     super.initState();
     if (widget.fromEmote) {
-      selectKeyboard.value = false;
       updatePanelType(PanelType.emoji);
     }
   }
@@ -100,7 +99,6 @@ class _ReplyPageState extends CommonPublishPageState<LiveSendDmPanel> {
             onPointerUp: (event) {
               if (readOnly.value) {
                 updatePanelType(PanelType.keyboard);
-                selectKeyboard.value = true;
               }
             },
             child: Obx(
@@ -146,13 +144,12 @@ class _ReplyPageState extends CommonPublishPageState<LiveSendDmPanel> {
               () => ToolbarIconButton(
                 tooltip: '输入',
                 onPressed: () {
-                  if (!selectKeyboard.value) {
-                    selectKeyboard.value = true;
+                  if (panelType.value != PanelType.keyboard) {
                     updatePanelType(PanelType.keyboard);
                   }
                 },
                 icon: const Icon(Icons.keyboard, size: 22),
-                selected: selectKeyboard.value,
+                selected: panelType.value == PanelType.keyboard,
               ),
             ),
             const SizedBox(width: 10),
@@ -160,13 +157,12 @@ class _ReplyPageState extends CommonPublishPageState<LiveSendDmPanel> {
               () => ToolbarIconButton(
                 tooltip: '表情',
                 onPressed: () {
-                  if (selectKeyboard.value) {
-                    selectKeyboard.value = false;
+                  if (panelType.value != PanelType.emoji) {
                     updatePanelType(PanelType.emoji);
                   }
                 },
                 icon: const Icon(Icons.emoji_emotions, size: 22),
-                selected: !selectKeyboard.value,
+                selected: panelType.value == PanelType.emoji,
               ),
             ),
             const Spacer(),

@@ -73,10 +73,8 @@ class AuthorPanel extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: item.modules.moduleAuthor!.type == 'AUTHOR_TYPE_PGC' ||
-                    item.modules.moduleAuthor!.type == 'AUTHOR_TYPE_UGC_SEASON'
-                ? null
-                : () {
+            onTap: item.modules.moduleAuthor!.type == 'AUTHOR_TYPE_NORMAL'
+                ? () {
                     feedBack();
                     Get.toNamed(
                       '/member?mid=${item.modules.moduleAuthor!.mid}',
@@ -84,7 +82,8 @@ class AuthorPanel extends StatelessWidget {
                         'face': item.modules.moduleAuthor!.face,
                       },
                     );
-                  },
+                  }
+                : null,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -240,7 +239,7 @@ class AuthorPanel extends StatelessWidget {
       useSafeArea: true,
       isScrollControlled: true,
       constraints: BoxConstraints(
-        maxWidth: min(640, min(Get.width, Get.height)),
+        maxWidth: min(640, context.mediaQueryShortestSide),
       ),
       builder: (context1) {
         final theme = Theme.of(context);

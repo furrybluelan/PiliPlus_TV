@@ -9,7 +9,7 @@ import 'package:PiliPlus/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:get/get.dart';
 
 class SearchTrendingPage extends StatefulWidget {
@@ -58,7 +58,8 @@ class _SearchTrendingPageState extends State<SearchTrendingPage> {
       final width = constraints.maxWidth > constraints.maxHeight
           ? min(640.0, maxWidth * 0.6)
           : maxWidth;
-      _offset = width * 528 / 1125 - 56 - Get.mediaQuery.padding.top;
+      final height = width * 528 / 1125;
+      _offset = height - 56 - Get.mediaQuery.padding.top;
       listener();
       final removePadding = maxWidth > width;
       return Scaffold(
@@ -113,11 +114,13 @@ class _SearchTrendingPageState extends State<SearchTrendingPage> {
                 onRefresh: _controller.onRefresh,
                 child: CustomScrollView(
                   controller: _controller.scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
                     SliverToBoxAdapter(
                       child: Image.asset(
+                        width: width,
+                        height: height,
                         'assets/images/trending_banner.png',
-                        fit: BoxFit.fitWidth,
                         filterQuality: FilterQuality.low,
                       ),
                     ),

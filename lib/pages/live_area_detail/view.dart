@@ -4,6 +4,7 @@ import 'package:PiliPlus/common/widgets/scroll_physics.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models/common/image_type.dart';
 import 'package:PiliPlus/models/live/live_area_list/area_item.dart';
+import 'package:PiliPlus/pages/live_area_detail/child/controller.dart';
 import 'package:PiliPlus/pages/live_area_detail/child/view.dart';
 import 'package:PiliPlus/pages/live_area_detail/controller.dart';
 import 'package:PiliPlus/pages/live_search/view.dart';
@@ -76,6 +77,17 @@ class _LiveAreaDetailPageState extends State<LiveAreaDetailPage> {
                               tabs: response
                                   .map((e) => Tab(text: e.name ?? ''))
                                   .toList(),
+                              onTap: (index) {
+                                try {
+                                  if (!DefaultTabController.of(context)
+                                      .indexIsChanging) {
+                                    final item = response[index];
+                                    Get.find<LiveAreaChildController>(
+                                            tag: '${item.id}${item.parentId}')
+                                        .animateToTop();
+                                  }
+                                } catch (_) {}
+                              },
                             ),
                           ),
                           iconButton(
@@ -157,57 +169,49 @@ class _LiveAreaDetailPageState extends State<LiveAreaDetailPage> {
           expand: false,
           snapSizes: const [1],
           builder: (_, scrollController) {
-            return NotificationListener<DraggableScrollableNotification>(
-              onNotification: (notification) {
-                if (notification.extent <= 1e-5) {
-                  Get.back();
-                }
-                return false;
-              },
-              child: Column(
-                children: [
-                  AppBar(
-                    centerTitle: true,
-                    backgroundColor: Colors.transparent,
-                    automaticallyImplyLeading: false,
-                    title: Text(widget.parentName),
-                    actions: [
-                      IconButton(
-                        onPressed: Get.back,
-                        icon: const Icon(Icons.clear),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                  ),
-                  Expanded(
-                    child: GridView.builder(
-                      controller: scrollController,
-                      padding: EdgeInsets.only(
-                        top: 12,
-                        bottom: MediaQuery.paddingOf(context).bottom + 80,
-                      ),
-                      itemCount: list.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 100,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        mainAxisExtent: 80,
-                      ),
-                      itemBuilder: (_, index) {
-                        return _tagItem(
-                          theme: theme,
-                          item: list[index],
-                          onTap: () {
-                            Get.back();
-                            DefaultTabController.of(context).index = index;
-                          },
-                        );
-                      },
+            return Column(
+              children: [
+                AppBar(
+                  centerTitle: true,
+                  backgroundColor: Colors.transparent,
+                  automaticallyImplyLeading: false,
+                  title: Text(widget.parentName),
+                  actions: [
+                    IconButton(
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.clear),
                     ),
+                    const SizedBox(width: 12),
+                  ],
+                ),
+                Expanded(
+                  child: GridView.builder(
+                    controller: scrollController,
+                    padding: EdgeInsets.only(
+                      top: 12,
+                      bottom: MediaQuery.paddingOf(context).bottom + 80,
+                    ),
+                    itemCount: list.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 100,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      mainAxisExtent: 80,
+                    ),
+                    itemBuilder: (_, index) {
+                      return _tagItem(
+                        theme: theme,
+                        item: list[index],
+                        onTap: () {
+                          Get.back();
+                          DefaultTabController.of(context).index = index;
+                        },
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         );

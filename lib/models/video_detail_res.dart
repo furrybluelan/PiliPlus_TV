@@ -498,7 +498,7 @@ class Stat {
 
   Stat.fromJson(Map<String, dynamic> json) {
     aid = json["aid"];
-    view = json["view"];
+    view = json["view"] == -1 ? 0 : json["view"];
     danmaku = json["danmaku"];
     reply = json["reply"];
     favorite = json["favorite"];

@@ -2,8 +2,8 @@ import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/badge.dart';
 import 'package:PiliPlus/common/widgets/button/icon_button.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
-import 'package:PiliPlus/models/bangumi/list.dart';
 import 'package:PiliPlus/models/common/badge_type.dart';
+import 'package:PiliPlus/models/pgc/list.dart';
 import 'package:PiliPlus/pages/common/multi_select_controller.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:flutter/material.dart';
@@ -144,10 +144,10 @@ class FavPgcItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(item.title!),
-                        if (item.newEp?['index_show'] != null) ...[
+                        if (item.newEp?.indexShow != null) ...[
                           const SizedBox(height: 6),
                           Text(
-                            '${item.newEp?['index_show']}${item.isFinish == 0 && item.renewalTime?.isNotEmpty == true ? '，${item.renewalTime}' : ''}',
+                            '${item.newEp!.indexShow}${item.isFinish == 0 && item.renewalTime?.isNotEmpty == true ? '，${item.renewalTime}' : ''}',
                             style: TextStyle(
                               fontSize: 13,
                               color: theme.colorScheme.onSurfaceVariant,
@@ -156,8 +156,7 @@ class FavPgcItem extends StatelessWidget {
                         ],
                         if (item.progress != null) ...[
                           SizedBox(
-                              height:
-                                  item.newEp?['index_show'] != null ? 2 : 6),
+                              height: item.newEp?.indexShow != null ? 2 : 6),
                           Text(
                             item.progress!,
                             style: TextStyle(

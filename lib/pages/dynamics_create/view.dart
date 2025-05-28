@@ -1,13 +1,24 @@
+import 'dart:math';
+
+import 'package:PiliPlus/common/widgets/button/icon_button.dart';
 import 'package:PiliPlus/common/widgets/button/toolbar_icon_button.dart';
-import 'package:PiliPlus/http/msg.dart';
+import 'package:PiliPlus/common/widgets/custom_icon.dart';
+import 'package:PiliPlus/common/widgets/draggable_sheet/draggable_scrollable_sheet_topic.dart'
+    show DraggableScrollableSheet;
+import 'package:PiliPlus/common/widgets/pair.dart';
+import 'package:PiliPlus/http/dynamics.dart';
 import 'package:PiliPlus/models/common/publish_panel_type.dart';
 import 'package:PiliPlus/models/common/reply/reply_option_type.dart';
+import 'package:PiliPlus/models/topic_pub_search/topic_item.dart';
 import 'package:PiliPlus/pages/common/common_publish_page.dart';
+import 'package:PiliPlus/pages/dynamics_select_topic/controller.dart';
+import 'package:PiliPlus/pages/dynamics_select_topic/view.dart';
 import 'package:PiliPlus/pages/emote/controller.dart';
 import 'package:PiliPlus/pages/emote/view.dart';
 import 'package:PiliPlus/utils/request_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DraggableScrollableSheet;
+import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -16,21 +27,29 @@ class CreateDynPanel extends CommonPublishPage {
   const CreateDynPanel({
     super.key,
     super.imageLengthLimit = 18,
+    this.scrollController,
   });
+
+  final ScrollController? scrollController;
 
   @override
   State<CreateDynPanel> createState() => _CreateDynPanelState();
 }
 
 class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
-  bool _isPrivate = false;
-  DateTime? _publishTime;
-  ReplyOptionType _replyOption = ReplyOptionType.allow;
+  final RxBool _isPrivate = false.obs;
+  final Rx<DateTime?> _publishTime = Rx<DateTime?>(null);
+  final Rx<ReplyOptionType> _replyOption = ReplyOptionType.allow.obs;
+  final _titleEditCtr = TextEditingController();
+  Rx<Pair<int, String>?> topic = Rx<Pair<int, String>?>(null);
 
   @override
   void dispose() {
+    _titleEditCtr.dispose();
     try {
-      Get.delete<EmotePanelController>();
+      Get
+        ..delete<EmotePanelController>()
+        ..delete<SelectTopicController>();
     } catch (_) {}
     super.dispose();
   }
@@ -46,15 +65,115 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              controller: widget.scrollController,
+              physics: const ClampingScrollPhysics(),
               children: [
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildEditWidget,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Obx(
+                    () {
+                      final hasTopic = topic.value != null;
+                      return Row(
+                        spacing: 10,
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              overlayColor:
+                                  hasTopic ? Colors.transparent : null,
+                              splashFactory:
+                                  hasTopic ? NoSplash.splashFactory : null,
+                              shape: hasTopic
+                                  ? null
+                                  : RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        color: hasTopic
+                                            ? Colors.transparent
+                                            : theme.colorScheme.outline
+                                                .withValues(alpha: 0.2),
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(25),
+                                      ),
+                                    ),
+                              minimumSize: Size.zero,
+                              padding: hasTopic
+                                  ? const EdgeInsets.symmetric(vertical: 12)
+                                  : const EdgeInsets.all(12),
+                              visualDensity: VisualDensity.compact,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            onPressed: _onSelectTopic,
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  WidgetSpan(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: Icon(
+                                        CustomIcon.topic_tag,
+                                        size: 18,
+                                        color: hasTopic
+                                            ? null
+                                            : theme.colorScheme.outline,
+                                      ),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        hasTopic ? topic.value!.second : '选择话题',
+                                    style: TextStyle(
+                                      color: hasTopic
+                                          ? null
+                                          : theme.colorScheme.outline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (hasTopic)
+                            iconButton(
+                              size: 22,
+                              iconSize: 16,
+                              context: context,
+                              icon: Icons.clear,
+                              bgColor: theme.colorScheme.onInverseSurface,
+                              iconColor: theme.colorScheme.onSurfaceVariant,
+                              onPressed: () => topic.value = null,
+                            ),
+                        ],
+                      );
+                    },
                   ),
+                ),
+                const SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    controller: _titleEditCtr,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      hintText: '标题，选填20字',
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                      border: const OutlineInputBorder(
+                        gapPadding: 0,
+                        borderSide: BorderSide.none,
+                      ),
+                      hintStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.outline.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    inputFormatters: [LengthLimitingTextInputFormatter(20)],
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildEditWidget(theme),
                 ),
                 const SizedBox(height: 16),
                 Padding(
@@ -62,14 +181,14 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildPubtimeWidget,
+                      Obx(() => _buildPubtimeWidget),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildReplyOptionWidget(theme),
+                          Obx(() => _buildReplyOptionWidget(theme)),
                           const SizedBox(height: 5),
-                          _buildPrivateWidget(theme),
+                          Obx(() => _buildPrivateWidget(theme)),
                         ],
                       ),
                     ],
@@ -77,7 +196,6 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
                 ),
                 const SizedBox(height: 10),
                 _buildImageList(theme),
-                const SizedBox(height: 2),
               ],
             ),
           ),
@@ -91,41 +209,46 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
   Widget _buildImageList(ThemeData theme) => Obx(
         () => SizedBox(
           height: 100,
-          child: ListView.separated(
+          width: double.infinity,
+          child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: pathList.length == limit ? limit : pathList.length + 1,
-            itemBuilder: (context, index) {
-              if (pathList.length != limit && index == pathList.length) {
-                return Material(
-                  borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  child: InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    onTap: () => onPickImage(() {
-                      if (pathList.isNotEmpty && !enablePublish.value) {
-                        enablePublish.value = true;
-                      }
-                    }),
-                    child: Ink(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12)),
-                        color: theme.colorScheme.secondaryContainer,
-                      ),
-                      child: const Center(child: Icon(Icons.add, size: 35)),
-                    ),
+            child: Row(
+              spacing: 10,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...List.generate(
+                    pathList.length, (index) => buildImage(index, 100)),
+                if (pathList.length != limit)
+                  Builder(
+                    builder: (context) {
+                      const borderRadius =
+                          BorderRadius.all(Radius.circular(10));
+                      return Material(
+                        borderRadius: borderRadius,
+                        child: InkWell(
+                          borderRadius: borderRadius,
+                          onTap: () => onPickImage(() {
+                            if (pathList.isNotEmpty && !enablePublish.value) {
+                              enablePublish.value = true;
+                            }
+                          }),
+                          child: Ink(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              borderRadius: borderRadius,
+                              color: theme.colorScheme.secondaryContainer,
+                            ),
+                            child:
+                                const Center(child: Icon(Icons.add, size: 35)),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              } else {
-                return buildImage(index, 100);
-              }
-            },
-            separatorBuilder: (context, index) => const SizedBox(width: 10),
+              ],
+            ),
           ),
         ),
       );
@@ -181,7 +304,7 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
                       ),
                       visualDensity: VisualDensity.compact,
                     ),
-                    child: Text(_publishTime == null ? '发布' : '定时发布'),
+                    child: Text(_publishTime.value == null ? '发布' : '定时发布'),
                   ),
                 ),
               ),
@@ -191,20 +314,17 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
       );
 
   Widget _buildPrivateWidget(ThemeData theme) {
-    final color =
-        _isPrivate ? theme.colorScheme.error : theme.colorScheme.secondary;
-    return PopupMenuButton(
-      initialValue: _isPrivate,
+    final color = _isPrivate.value
+        ? theme.colorScheme.error
+        : theme.colorScheme.secondary;
+    return PopupMenuButton<bool>(
+      initialValue: _isPrivate.value,
       onOpened: controller.keepChatPanel,
-      onSelected: (value) {
-        setState(() {
-          _isPrivate = value;
-        });
-      },
+      onSelected: (value) => _isPrivate.value = value,
       itemBuilder: (context) => List.generate(
         2,
         (index) => PopupMenuItem<bool>(
-          enabled: _publishTime != null && index == 1 ? false : true,
+          enabled: _publishTime.value != null && index == 1 ? false : true,
           value: index == 0 ? false : true,
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -226,12 +346,12 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
           children: [
             Icon(
               size: 19,
-              _isPrivate ? Icons.visibility_off : Icons.visibility,
+              _isPrivate.value ? Icons.visibility_off : Icons.visibility,
               color: color,
             ),
             const SizedBox(width: 4),
             Text(
-              _isPrivate ? '仅自己可见' : '所有人可见',
+              _isPrivate.value ? '仅自己可见' : '所有人可见',
               style: TextStyle(
                 height: 1,
                 color: color,
@@ -250,17 +370,13 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
   }
 
   Widget _buildReplyOptionWidget(ThemeData theme) {
-    final color = _replyOption == ReplyOptionType.close
+    final color = _replyOption.value == ReplyOptionType.close
         ? theme.colorScheme.error
         : theme.colorScheme.secondary;
-    return PopupMenuButton(
-      initialValue: _replyOption,
+    return PopupMenuButton<ReplyOptionType>(
+      initialValue: _replyOption.value,
       onOpened: controller.keepChatPanel,
-      onSelected: (item) {
-        setState(() {
-          _replyOption = item;
-        });
-      },
+      onSelected: (item) => _replyOption.value = item,
       itemBuilder: (context) => ReplyOptionType.values
           .map(
             (item) => PopupMenuItem<ReplyOptionType>(
@@ -286,12 +402,12 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
           children: [
             Icon(
               size: 19,
-              _replyOption.iconData,
+              _replyOption.value.iconData,
               color: color,
             ),
             const SizedBox(width: 4),
             Text(
-              _replyOption.title,
+              _replyOption.value.title,
               style: TextStyle(
                 height: 1,
                 color: color,
@@ -309,7 +425,7 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
     );
   }
 
-  Widget get _buildPubtimeWidget => _publishTime == null
+  Widget get _buildPubtimeWidget => _publishTime.value == null
       ? FilledButton.tonal(
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(
@@ -318,7 +434,7 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
             ),
             visualDensity: VisualDensity.compact,
           ),
-          onPressed: _isPrivate
+          onPressed: _isPrivate.value
               ? null
               : () {
                   DateTime nowDate = DateTime.now();
@@ -358,15 +474,13 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
                                 }
                               }
                             }
-                            setState(() {
-                              _publishTime = DateTime(
-                                selectedDate.year,
-                                selectedDate.month,
-                                selectedDate.day,
-                                selectedTime.hour,
-                                selectedTime.minute,
-                              );
-                            });
+                            _publishTime.value = DateTime(
+                              selectedDate.year,
+                              selectedDate.month,
+                              selectedDate.day,
+                              selectedTime.hour,
+                              selectedTime.minute,
+                            );
                           }
                         });
                       }
@@ -383,42 +497,37 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
             ),
             visualDensity: VisualDensity.compact,
           ),
-          onPressed: () => setState(() => _publishTime = null),
-          label: Text(DateFormat('yyyy-MM-dd HH:mm').format(_publishTime!)),
+          onPressed: () => _publishTime.value = null,
+          label:
+              Text(DateFormat('yyyy-MM-dd HH:mm').format(_publishTime.value!)),
           icon: const Icon(Icons.clear, size: 20),
           iconAlignment: IconAlignment.end,
         );
 
   Widget get _buildToolbar => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            Obx(
-              () => ToolbarIconButton(
-                onPressed: () {
-                  selectKeyboard.value = PanelType.emoji == currentPanelType;
-                  updatePanelType(
-                    PanelType.emoji == currentPanelType
-                        ? PanelType.keyboard
-                        : PanelType.emoji,
-                  );
-                },
-                icon: const Icon(Icons.emoji_emotions, size: 22),
-                tooltip: '表情',
-                selected: !selectKeyboard.value,
-              ),
-            ),
-          ],
+        child: Obx(
+          () => ToolbarIconButton(
+            onPressed: () {
+              updatePanelType(
+                panelType.value == PanelType.emoji
+                    ? PanelType.keyboard
+                    : PanelType.emoji,
+              );
+            },
+            icon: const Icon(Icons.emoji_emotions, size: 22),
+            tooltip: '表情',
+            selected: panelType.value == PanelType.emoji,
+          ),
         ),
       );
 
-  Widget get _buildEditWidget => Form(
+  Widget _buildEditWidget(ThemeData theme) => Form(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Listener(
           onPointerUp: (event) {
             if (readOnly.value) {
               updatePanelType(PanelType.keyboard);
-              selectKeyboard.value = true;
             }
           },
           child: Obx(
@@ -436,14 +545,16 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
                   enablePublish.value = false;
                 }
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '说点什么吧',
-                border: OutlineInputBorder(
+                hintStyle: TextStyle(color: theme.colorScheme.outline),
+                border: const OutlineInputBorder(
                   borderSide: BorderSide.none,
                   gapPadding: 0,
                 ),
                 contentPadding: EdgeInsets.zero,
               ),
+              inputFormatters: [LengthLimitingTextInputFormatter(1000)],
             ),
           ),
         ),
@@ -456,15 +567,17 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
   Future<void> onCustomPublish(
       {required String message, List? pictures}) async {
     SmartDialog.showLoading(msg: '正在发布');
-    dynamic result = await MsgHttp.createDynamic(
+    var result = await DynamicsHttp.createDynamic(
       mid: Accounts.main.mid,
       rawText: editController.text,
       pics: pictures,
-      publishTime: _publishTime != null
-          ? _publishTime!.millisecondsSinceEpoch ~/ 1000
+      publishTime: _publishTime.value != null
+          ? _publishTime.value!.millisecondsSinceEpoch ~/ 1000
           : null,
-      replyOption: _replyOption,
-      privatePub: _isPrivate ? 1 : null,
+      replyOption: _replyOption.value,
+      privatePub: _isPrivate.value ? 1 : null,
+      title: _titleEditCtr.text,
+      topic: topic.value,
     );
     SmartDialog.dismiss();
     if (result['status']) {
@@ -478,6 +591,34 @@ class _CreateDynPanelState extends CommonPublishPageState<CreateDynPanel> {
     } else {
       SmartDialog.showToast(result['msg']);
       debugPrint('failed to publish: ${result['msg']}');
+    }
+  }
+
+  double _offset = 0;
+  Future<void> _onSelectTopic() async {
+    TopicPubSearchItem? res = await showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxWidth: min(600, context.mediaQueryShortestSide),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        snap: true,
+        minChildSize: 0,
+        maxChildSize: 1,
+        initialChildSize: _offset == 0 ? 0.65 : 1,
+        initialScrollOffset: _offset,
+        snapSizes: const [0.65],
+        builder: (context, scrollController) => SelectTopicPanel(
+          scrollController: scrollController,
+          callback: (offset) => _offset = offset,
+        ),
+      ),
+    );
+    if (res != null) {
+      topic.value = Pair(first: res.id!, second: res.name!);
     }
   }
 }

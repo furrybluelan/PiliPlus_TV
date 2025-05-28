@@ -1,3 +1,4 @@
+import 'package:PiliPlus/models/space_fav/list.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'favourite2.g.dart';
@@ -5,7 +6,7 @@ part 'favourite2.g.dart';
 @JsonSerializable()
 class Favourite2 {
   int? count;
-  List<dynamic>? item;
+  List<SpaceFavItemModel>? item;
 
   Favourite2({this.count, this.item});
 

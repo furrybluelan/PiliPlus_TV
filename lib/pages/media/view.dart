@@ -77,12 +77,12 @@ class _MediaPageState extends CommonPageState<MediaPage, MediaController>
             ),
             for (var item in controller.list)
               ListTile(
-                onTap: item['onTap'],
+                onTap: item.onTap,
                 dense: true,
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 15),
                   child: Icon(
-                    item['icon'],
+                    item.icon,
                     color: primary,
                   ),
                 ),
@@ -90,7 +90,7 @@ class _MediaPageState extends CommonPageState<MediaPage, MediaController>
                     const EdgeInsets.only(left: 15, top: 2, bottom: 2),
                 minLeadingWidth: 0,
                 title: Text(
-                  item['title'],
+                  item.title,
                   style: const TextStyle(fontSize: 15),
                 ),
               ),

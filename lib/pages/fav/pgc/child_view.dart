@@ -4,7 +4,7 @@ import 'package:PiliPlus/common/widgets/dialog/dialog.dart';
 import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
 import 'package:PiliPlus/common/widgets/refresh_indicator.dart';
 import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/bangumi/list.dart';
+import 'package:PiliPlus/models/pgc/list.dart';
 import 'package:PiliPlus/pages/fav/pgc/controller.dart';
 import 'package:PiliPlus/pages/fav/pgc/widget/item.dart';
 import 'package:PiliPlus/utils/grid.dart';
@@ -43,6 +43,8 @@ class _FavPgcChildPageState extends State<FavPgcChildPage>
           refreshIndicator(
             onRefresh: _favPgcController.onRefresh,
             child: CustomScrollView(
+              controller: _favPgcController.scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.only(
@@ -109,15 +111,15 @@ class _FavPgcChildPageState extends State<FavPgcChildPage>
                         ),
                       ),
                       const Spacer(),
-                      ...[
-                        {'followStatus': 1, 'title': '想看'},
-                        {'followStatus': 2, 'title': '在看'},
-                        {'followStatus': 3, 'title': '看过'},
+                      ...const <({int followStatus, String title})>[
+                        (followStatus: 1, title: '想看'),
+                        (followStatus: 2, title: '在看'),
+                        (followStatus: 3, title: '看过'),
                       ]
                           .where((item) =>
-                              item['followStatus'] != widget.followStatus)
+                              item.followStatus != widget.followStatus)
                           .map(
-                            (Map item) => Padding(
+                            (item) => Padding(
                               padding: const EdgeInsets.only(left: 25),
                               child: GestureDetector(
                                 behavior: HitTestBehavior.opaque,
@@ -125,14 +127,14 @@ class _FavPgcChildPageState extends State<FavPgcChildPage>
                                   if (_favPgcController.checkedCount.value !=
                                       0) {
                                     _favPgcController
-                                        .onUpdateList(item['followStatus']);
+                                        .onUpdateList(item.followStatus);
                                   }
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 14, horizontal: 5),
                                   child: Text(
-                                    '标记为${item['title']}',
+                                    '标记为${item.title}',
                                     style: TextStyle(
                                       color: theme.colorScheme.onSurfaceVariant,
                                     ),

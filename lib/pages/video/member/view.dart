@@ -92,10 +92,7 @@ class _HorizontalMemberPageState extends State<HorizontalMemberPage> {
                 onRefresh: _controller.onRefresh,
                 child: CustomScrollView(
                   controller: _controller.scrollController,
-                  // physics: PositionRetainedScrollPhysics(
-                  //   shouldRetain: _controller.hasPrev,
-                  //   parent: const ClampingScrollPhysics(),
-                  // ),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
                     _buildSliverHeader(theme),
                     Obx(() =>

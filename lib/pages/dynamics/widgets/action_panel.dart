@@ -50,7 +50,9 @@ class _ActionPanelState extends State<ActionPanel> {
         item.modules.moduleStat?.like?.count = count - 1;
         item.modules.moduleStat?.like?.status = false;
       }
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     } else {
       SmartDialog.showToast(res['msg']);
     }

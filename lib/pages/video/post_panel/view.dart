@@ -17,7 +17,7 @@ import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -485,9 +485,7 @@ class _PostPanelState extends CommonCollapseSlidePageState<PostPanel> {
                     initV = value;
                   },
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'[\d:.]+'),
-                    ),
+                    FilteringTextInputFormatter.allow(RegExp(r'[\d:.]+')),
                   ],
                 ),
                 actions: [

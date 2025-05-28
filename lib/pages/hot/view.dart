@@ -109,7 +109,6 @@ class _HotPageState extends CommonPageState<HotPage, HotController>
                                 'url':
                                     'https://www.bilibili.com/h5/weekly-recommend'
                               },
-                              arguments: {'off': false},
                             ),
                           ),
                           _buildEntranceItem(
@@ -122,7 +121,6 @@ class _HotPageState extends CommonPageState<HotPage, HotController>
                                 'url':
                                     'https://www.bilibili.com/h5/good-history'
                               },
-                              arguments: {'off': false},
                             ),
                           ),
                         ],

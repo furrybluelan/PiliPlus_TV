@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -291,7 +290,7 @@ class _SavePanelState extends State<SavePanel> {
               child: GestureDetector(
                 onTap: () {},
                 child: Container(
-                  width: min(Get.width, Get.height),
+                  width: context.mediaQueryShortestSide,
                   margin: const EdgeInsets.symmetric(horizontal: 12),
                   child: RepaintBoundary(
                     key: boundaryKey,

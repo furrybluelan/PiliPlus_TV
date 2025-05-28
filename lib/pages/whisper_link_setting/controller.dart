@@ -84,7 +84,6 @@ class WhisperLinkSettingController extends GetxController {
       sessionSs
         ..value.data.pushSetting = setting
         ..refresh();
-      SmartDialog.showToast('操作成功');
     } else {
       SmartDialog.showToast(res['msg']);
     }
@@ -96,7 +95,6 @@ class WhisperLinkSettingController extends GetxController {
         : await ImGrpc.pinSession(sessionId: sessionId);
     if (res.isSuccess) {
       isPinned.value = !isPinned.value;
-      SmartDialog.showToast('操作成功');
     } else {
       res.toast();
     }
@@ -113,7 +111,6 @@ class WhisperLinkSettingController extends GetxController {
       msgDnd
         ..value.data!.first.setting = setting
         ..refresh();
-      SmartDialog.showToast('操作成功');
     } else {
       SmartDialog.showToast(res['msg']);
     }
@@ -131,7 +128,6 @@ class WhisperLinkSettingController extends GetxController {
           ..value.data.followStatus = null
           ..refresh();
         GStorage.removeBlackMid(talkerUid);
-        SmartDialog.showToast('操作成功');
       } else {
         SmartDialog.showToast(res['msg']);
       }
@@ -151,7 +147,6 @@ class WhisperLinkSettingController extends GetxController {
               ..value.data.followStatus = 128
               ..refresh();
             GStorage.setBlackMid(talkerUid);
-            SmartDialog.showToast('操作成功');
           } else {
             SmartDialog.showToast(res['msg']);
           }

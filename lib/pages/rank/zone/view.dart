@@ -40,6 +40,7 @@ class _ZonePageState extends CommonPageState<ZonePage, ZoneController>
       onRefresh: controller.onRefresh,
       child: CustomScrollView(
         controller: controller.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverPadding(
             padding: EdgeInsets.only(

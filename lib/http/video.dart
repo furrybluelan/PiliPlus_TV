@@ -6,14 +6,15 @@ import 'package:PiliPlus/http/api.dart';
 import 'package:PiliPlus/http/init.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/login.dart';
-import 'package:PiliPlus/models/bangumi/pgc_rank/pgc_rank_item_model.dart';
 import 'package:PiliPlus/models/common/account_type.dart';
 import 'package:PiliPlus/models/home/rcmd/result.dart';
 import 'package:PiliPlus/models/member/article.dart';
 import 'package:PiliPlus/models/model_hot_video_item.dart';
 import 'package:PiliPlus/models/model_rec_video_item.dart';
+import 'package:PiliPlus/models/pgc/pgc_rank/pgc_rank_item_model.dart';
 import 'package:PiliPlus/models/user/fav_folder.dart';
 import 'package:PiliPlus/models/video/ai.dart';
+import 'package:PiliPlus/models/video/note_list/data.dart';
 import 'package:PiliPlus/models/video/play/url.dart';
 import 'package:PiliPlus/models/video_detail_res.dart';
 import 'package:PiliPlus/utils/extension.dart';
@@ -1015,7 +1016,7 @@ class VideoHttp {
     }
   }
 
-  static Future<LoadingState> getVideoNoteList({
+  static Future<LoadingState<NoteListData>> getVideoNoteList({
     dynamic oid,
     dynamic uperMid,
     required int page,
@@ -1032,13 +1033,13 @@ class VideoHttp {
       },
     );
     if (res.data['code'] == 0) {
-      return Success(res.data['data']);
+      return Success(NoteListData.fromJson(res.data['data']));
     } else {
       return Error(res.data['message']);
     }
   }
 
-  static Future<LoadingState<List<FavArticleModel>?>> noteList({
+  static Future<LoadingState<List<FavNoteModel>?>> noteList({
     required int page,
   }) async {
     var res = await Request().get(
@@ -1050,8 +1051,8 @@ class VideoHttp {
       },
     );
     if (res.data['code'] == 0) {
-      List<FavArticleModel>? list = (res.data['data']?['list'] as List?)
-          ?.map((e) => FavArticleModel.fromJson(e))
+      List<FavNoteModel>? list = (res.data['data']?['list'] as List?)
+          ?.map((e) => FavNoteModel.fromJson(e))
           .toList();
       return Success(list);
     } else {
@@ -1059,7 +1060,7 @@ class VideoHttp {
     }
   }
 
-  static Future<LoadingState<List<FavArticleModel>?>> userNoteList({
+  static Future<LoadingState<List<FavNoteModel>?>> userNoteList({
     required int page,
   }) async {
     var res = await Request().get(
@@ -1071,8 +1072,8 @@ class VideoHttp {
       },
     );
     if (res.data['code'] == 0) {
-      List<FavArticleModel>? list = (res.data['data']?['list'] as List?)
-          ?.map((e) => FavArticleModel.fromJson(e))
+      List<FavNoteModel>? list = (res.data['data']?['list'] as List?)
+          ?.map((e) => FavNoteModel.fromJson(e))
           .toList();
       return Success(list);
     } else {

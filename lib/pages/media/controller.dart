@@ -8,39 +8,32 @@ import 'package:get/get.dart';
 
 class MediaController
     extends CommonDataController<FavFolderData, FavFolderData> {
-  List list = [
-    // {
-    //   'icon': Icons.file_download_outlined,
-    //   'title': '离线缓存',
-    //   'onTap': () {
-    //     SmartDialog.showToast('功能开发中');
-    //   },
-    // },
-    {
-      'icon': Icons.history,
-      'title': '观看记录',
-      'onTap': () => Get.toNamed('/history'),
-    },
-    {
-      'icon': Icons.subscriptions_outlined,
-      'title': '我的订阅',
-      'onTap': () => Get.toNamed('/subscription'),
-    },
-    {
-      'icon': Icons.watch_later_outlined,
-      'title': '稍后再看',
-      'onTap': () => Get.toNamed('/later'),
-    },
-    {
-      'icon': Icons.create_outlined,
-      'title': '创作中心',
-      'onTap': () => Get.toNamed(
+  final list = <({IconData icon, String title, VoidCallback onTap})>[
+    (
+      icon: Icons.history,
+      title: '观看记录',
+      onTap: () => Get.toNamed('/history'),
+    ),
+    (
+      icon: Icons.subscriptions_outlined,
+      title: '我的订阅',
+      onTap: () => Get.toNamed('/subscription'),
+    ),
+    (
+      icon: Icons.watch_later_outlined,
+      title: '稍后再看',
+      onTap: () => Get.toNamed('/later'),
+    ),
+    (
+      icon: Icons.create_outlined,
+      title: '创作中心',
+      onTap: () => Get.toNamed(
             '/webview',
             parameters: {
               'url': 'https://member.bilibili.com/platform/home',
             },
           ),
-    },
+    ),
   ];
   int? mid;
   RxInt count = (-1).obs;

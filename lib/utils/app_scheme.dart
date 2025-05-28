@@ -108,13 +108,15 @@ class PiliScheme {
               // to video reply
               String? oid = uriDigitRegExp.firstMatch(path)?.group(1);
               int? rpid = int.tryParse(queryParameters['comment_root_id']!);
+              String? commentSecondaryId =
+                  queryParameters['comment_secondary_id'];
               if (oid != null && rpid != null) {
                 Get.to(
                   arguments: {
                     'oid': oid,
                     'rpid': rpid,
                     'type': 1,
-                    'id': queryParameters['comment_secondary_id'],
+                    'id': commentSecondaryId,
                   },
                   () => Scaffold(
                     resizeToAvoidBottomInset: false,
@@ -142,9 +144,8 @@ class PiliScheme {
                         source: 'routePush',
                         replyType: 1,
                         firstFloor: null,
-                        id: queryParameters['comment_secondary_id'] != null
-                            ? int.tryParse(
-                                queryParameters['comment_secondary_id']!)
+                        id: commentSecondaryId != null
+                            ? int.tryParse(commentSecondaryId)
                             : null,
                       ),
                     ),
@@ -369,13 +370,15 @@ class PiliScheme {
               if (commentRootId != null) {
                 String? dynId = uriDigitRegExp.firstMatch(path)?.group(1);
                 int? rpid = int.tryParse(commentRootId);
+                final commentSecondaryId =
+                    queryParameters['comment_secondary_id'];
                 if (dynId != null && rpid != null) {
                   Get.to(
                     arguments: {
                       'oid': oid ?? dynId,
                       'rpid': rpid,
                       'type': businessId ?? 17,
-                      'id': queryParameters['comment_secondary_id'],
+                      'id': commentSecondaryId,
                     },
                     () => Scaffold(
                       resizeToAvoidBottomInset: false,
@@ -399,9 +402,8 @@ class PiliScheme {
                           source: 'routePush',
                           replyType: businessId ?? 17,
                           firstFloor: null,
-                          id: queryParameters['comment_secondary_id'] != null
-                              ? int.tryParse(
-                                  queryParameters['comment_secondary_id']!)
+                          id: commentSecondaryId != null
+                              ? int.tryParse(commentSecondaryId)
                               : null,
                         ),
                       ),
@@ -448,8 +450,7 @@ class PiliScheme {
             return false;
           case 'm.bilibili.com':
             // bilibili://m.bilibili.com/topic-detail?topic_id=1028161&frommodule=H5&h5awaken=xxx
-            final id =
-                RegExp(r'topic_id=(\d+)').firstMatch(uri.query)?.group(1);
+            final id = uri.queryParameters['topic_id'];
             if (id != null) {
               PageUtils.toDupNamed(
                 '/dynTopic',
@@ -589,27 +590,24 @@ class PiliScheme {
       launchURL();
       return false;
     }
-    final String? area = pathSegments.first == 'mobile'
-        ? pathSegments.getOrNull(1)
-        : pathSegments.first;
+    final String? area =
+        pathSegments.first == 'mobile' || pathSegments.first == 'h5'
+            ? pathSegments.getOrNull(1)
+            : pathSegments.first;
     debugPrint('area: $area');
     switch (area) {
-      case 'h5':
-        if (path.startsWith('/h5/note')) {
-          String? id = RegExp(r'cvid=(\d+)', caseSensitive: false)
-              .firstMatch(uri.query)
-              ?.group(1);
-          if (id != null) {
-            PageUtils.toDupNamed(
-              '/articlePage',
-              parameters: {
-                'id': id,
-                'type': 'read',
-              },
-              off: off,
-            );
-            return true;
-          }
+      case 'note' || 'note-app':
+        String? id = uri.queryParameters['cvid'];
+        if (id != null) {
+          PageUtils.toDupNamed(
+            '/articlePage',
+            parameters: {
+              'id': id,
+              'type': 'read',
+            },
+            off: off,
+          );
+          return true;
         }
         launchURL();
         return false;
@@ -742,12 +740,64 @@ class PiliScheme {
         launchURL();
         return false;
       case 'topic-detail':
-        String? id = RegExp(r'topic_id=(\d+)').firstMatch(uri.query)?.group(1);
+        String? id = uri.queryParameters['topic_id'];
         if (id != null) {
           PageUtils.toDupNamed(
             '/dynTopic',
             parameters: {'id': id},
             off: off,
+          );
+          return true;
+        }
+        launchURL();
+        return false;
+      case 'comment':
+        // https://www.bilibili.com/h5/comment/sub?oid=123456&pageType=1&root=87654321
+        final queryParameters = uri.queryParameters;
+        String? oid = queryParameters['oid'];
+        String? root = queryParameters['root'];
+        String? pageType = queryParameters['pageType'];
+        if (oid != null && root != null && pageType != null) {
+          String? commentSecondaryId = queryParameters['comment_secondary_id'];
+          Get.to(
+            arguments: {
+              'oid': oid,
+              'rpid': root,
+              'type': pageType,
+              'id': commentSecondaryId,
+            },
+            () => Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: const Text('评论详情'),
+                actions: pageType == '1'
+                    ? [
+                        IconButton(
+                          tooltip: '前往',
+                          onPressed: () {
+                            videoPush(int.parse(oid), null);
+                          },
+                          icon: const Icon(Icons.open_in_new),
+                        ),
+                      ]
+                    : null,
+              ),
+              body: SafeArea(
+                top: false,
+                bottom: false,
+                child: VideoReplyReplyPanel(
+                  enableSlide: false,
+                  oid: int.parse(oid),
+                  rpid: int.parse(root),
+                  source: 'routePush',
+                  replyType: int.parse(pageType),
+                  firstFloor: null,
+                  id: commentSecondaryId != null
+                      ? int.tryParse(commentSecondaryId)
+                      : null,
+                ),
+              ),
+            ),
           );
           return true;
         }

@@ -1,9 +1,11 @@
 import 'package:PiliPlus/common/widgets/image/image_save.dart';
 import 'package:PiliPlus/models/dynamics/result.dart';
 import 'package:PiliPlus/pages/dynamics/widgets/action_panel.dart';
+import 'package:PiliPlus/pages/dynamics/widgets/additional_panel.dart';
 import 'package:PiliPlus/pages/dynamics/widgets/author_panel.dart';
+import 'package:PiliPlus/pages/dynamics/widgets/blocked_item.dart';
 import 'package:PiliPlus/pages/dynamics/widgets/content_panel.dart';
-import 'package:PiliPlus/pages/dynamics/widgets/forward_panel.dart';
+import 'package:PiliPlus/pages/dynamics/widgets/module_panel.dart';
 import 'package:PiliPlus/utils/extension.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:flutter/material.dart';
@@ -65,10 +67,13 @@ class DynamicPanel extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
               child: authorWidget,
             ),
-            if (item.modules.moduleDynamic!.desc != null ||
-                item.modules.moduleDynamic!.major != null)
+            if (item.type != 'DYNAMIC_TYPE_NONE')
               content(theme, isSave, context, item, source, callback),
-            forWard(theme, isSave, item, context, source, callback),
+            module(theme, isSave, item, context, source, callback),
+            if (item.modules.moduleDynamic?.additional != null)
+              addWidget(theme, item, context),
+            if (item.modules.moduleDynamic?.major?.blocked != null)
+              blockedItem(theme, item.modules.moduleDynamic!.major!.blocked!),
             const SizedBox(height: 2),
             if (source == null) ActionPanel(item: item),
             if (source == 'detail' && !isSave) const SizedBox(height: 12),

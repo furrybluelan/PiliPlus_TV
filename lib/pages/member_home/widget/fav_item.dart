@@ -1,6 +1,7 @@
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/image/image_save.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
+import 'package:PiliPlus/models/space_fav/list.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,7 +9,7 @@ import 'package:get/get.dart';
 class MemberFavItem extends StatelessWidget {
   const MemberFavItem({super.key, required this.item});
 
-  final dynamic item;
+  final SpaceFavItemModel item;
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +17,19 @@ class MemberFavItem extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          if (item['type'] == 2) {
+          if (item.type == 2) {
             Get.toNamed(
               '/favDetail',
               parameters: {
-                'mediaId': item['media_id'].toString(),
-                'heroTag': Utils.makeHeroTag(item['media_id']),
+                'mediaId': item.mediaId.toString(),
+                'heroTag': Utils.makeHeroTag(item.mediaId),
               },
             );
           }
         },
         onLongPress: () => imageSaveDialog(
-          title: item['title'],
-          cover: item['cover'],
+          title: item.title,
+          cover: item.cover,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -44,7 +45,7 @@ class MemberFavItem extends StatelessWidget {
                 child: LayoutBuilder(
                   builder: (context, boxConstraints) {
                     return NetworkImgLayer(
-                      src: item['cover'],
+                      src: item.cover,
                       width: boxConstraints.maxWidth,
                       height: boxConstraints.maxHeight,
                     );
@@ -58,13 +59,13 @@ class MemberFavItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item['title'] ?? '',
+                      item.title!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
                     Text(
-                      '${item['count']}个内容 · ${item['is_public'] == 1 ? '私密' : '公开'}',
+                      '${item.count}个内容 · ${item.isPublic == 1 ? '私密' : '公开'}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).colorScheme.outline,

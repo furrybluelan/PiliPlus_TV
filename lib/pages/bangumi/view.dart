@@ -6,14 +6,15 @@ import 'package:PiliPlus/common/widgets/loading_widget/loading_widget.dart';
 import 'package:PiliPlus/common/widgets/refresh_indicator.dart';
 import 'package:PiliPlus/common/widgets/scroll_physics.dart';
 import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/bangumi/list.dart';
-import 'package:PiliPlus/models/bangumi/pgc_timeline/result.dart';
 import 'package:PiliPlus/models/common/fav_type.dart';
 import 'package:PiliPlus/models/common/home_tab_type.dart';
+import 'package:PiliPlus/models/pgc/list.dart';
+import 'package:PiliPlus/models/pgc/pgc_timeline/result.dart';
 import 'package:PiliPlus/pages/bangumi/controller.dart';
 import 'package:PiliPlus/pages/bangumi/widgets/bangumi_card_v.dart';
 import 'package:PiliPlus/pages/bangumi/widgets/bangumi_card_v_timeline.dart';
 import 'package:PiliPlus/pages/common/common_page.dart';
+import 'package:PiliPlus/pages/pgc_index/controller.dart';
 import 'package:PiliPlus/pages/pgc_index/view.dart';
 import 'package:PiliPlus/utils/extension.dart';
 import 'package:PiliPlus/utils/grid.dart';
@@ -241,25 +242,38 @@ class _BangumiPageState extends CommonPageState<BangumiPage, BangumiController>
                         appBar: AppBar(title: const Text('索引')),
                         body: DefaultTabController(
                           length: types.length,
-                          child: Column(
-                            children: [
-                              SafeArea(
-                                top: false,
-                                bottom: false,
-                                child: TabBar(
+                          child: Builder(builder: (context) {
+                            return Column(
+                              children: [
+                                SafeArea(
+                                  top: false,
+                                  bottom: false,
+                                  child: TabBar(
                                     tabs: titles
                                         .map((title) => Tab(text: title))
-                                        .toList()),
-                              ),
-                              Expanded(
-                                child: tabBarView(
-                                    children: types
-                                        .map((type) =>
-                                            PgcIndexPage(indexType: type))
-                                        .toList()),
-                              )
-                            ],
-                          ),
+                                        .toList(),
+                                    onTap: (index) {
+                                      try {
+                                        if (!DefaultTabController.of(context)
+                                            .indexIsChanging) {
+                                          Get.find<PgcIndexController>(
+                                                  tag: types[index].toString())
+                                              .animateToTop();
+                                        }
+                                      } catch (_) {}
+                                    },
+                                  ),
+                                ),
+                                Expanded(
+                                  child: tabBarView(
+                                      children: types
+                                          .map((type) =>
+                                              PgcIndexPage(indexType: type))
+                                          .toList()),
+                                )
+                              ],
+                            );
+                          }),
                         ),
                       ),
                     );
